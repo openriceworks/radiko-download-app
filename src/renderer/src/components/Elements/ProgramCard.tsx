@@ -7,7 +7,9 @@ import {
   CardHeader,
   CardPreview,
   makeStyles,
-  Image
+  Image,
+  ProgressBar,
+  Field
 } from '@fluentui/react-components'
 import { ArrowDownload24Regular } from '@fluentui/react-icons'
 import { ProgramForCard } from 'src/shared/types'
@@ -36,6 +38,7 @@ function ProgramCardHeader(program: ProgramForCard): JSX.Element {
 }
 
 function formatDateRange(fromDate: Dayjs, toDate: Dayjs): string {
+  // TODO 本当は5:00区切りで日付を変えたい 2023/01/02 1:00 -> 2023/01/01 25:00 みたいな
   const fromDatePattern = 'YYYY/MM/DD hh:mm'
   let toDatePattern = 'YYYY/MM/DD hh:mm'
 
@@ -64,7 +67,35 @@ function ProgramCardDescription(program: ProgramForCard): JSX.Element {
 
 export default function ProgramCard(props: Props): JSX.Element {
   const styles = useStyles()
-  const { downloadAudio, progress } = useDownloadAudio()
+  const { downloadAudio, progress, isDownloading } = useDownloadAudio()
+
+  const FooterContent = () => {
+    if (isDownloading) {
+      return (
+        <Field validationMessage="ダウンロード中" validationState="none" style={{ width: '100%' }}>
+          <ProgressBar value={progress / 100} />
+        </Field>
+      )
+    }
+
+    if (progress === 100) {
+      return (
+        <Field
+          validationMessage="ダウンロードしました"
+          validationState="success"
+          style={{ width: '100%' }}
+        >
+          <ProgressBar value={progress / 100} />
+        </Field>
+      )
+    }
+
+    return (
+      <Button icon={<ArrowDownload24Regular />} onClick={() => downloadAudio(props.program)}>
+        ダウンロード
+      </Button>
+    )
+  }
 
   return (
     <Card className={styles.card}>
@@ -80,10 +111,7 @@ export default function ProgramCard(props: Props): JSX.Element {
       </div>
 
       <CardFooter>
-        <Button icon={<ArrowDownload24Regular />} onClick={() => downloadAudio(props.program)}>
-          download
-        </Button>
-        <div>{progress}</div>
+        <FooterContent />
       </CardFooter>
     </Card>
   )
