@@ -1,12 +1,14 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { downloadAudio, getDownloadProgress, getStationList } from './radiko'
+import { ProgramForCard } from '../shared/types'
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
+    width: 960,
     height: 670,
     show: false,
     autoHideMenuBar: true,
@@ -24,6 +26,23 @@ function createWindow(): void {
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
+  })
+
+  ipcMain.handle('getStationList', async () => {
+    return await getStationList()
+  })
+
+  ipcMain.handle('downloadAudio', async (event, program: ProgramForCard) => {
+    return await downloadAudio(
+      program.stationId,
+      program.ft,
+      program.to,
+      app.getPath('downloads') + `/${program.title}.wav`
+    )
+  })
+
+  ipcMain.handle('getProgress', (event, key) => {
+    return getDownloadProgress(key)
   })
 
   // HMR for renderer base on electron-vite cli.

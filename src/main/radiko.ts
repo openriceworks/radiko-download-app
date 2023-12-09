@@ -1,0 +1,247 @@
+import dayjs, { Dayjs } from 'dayjs'
+import {
+  Program,
+  ProgramListForApi,
+  StationWithProgram,
+  isProgramListForApi
+} from '../shared/types'
+import { XMLParser } from 'fast-xml-parser'
+import ffmpeg from 'fluent-ffmpeg'
+import fs from 'fs'
+import os from 'os'
+
+import Store from 'electron-store'
+import { formatDayjs, getDateList, getDayjs, includesDate } from '../shared/util'
+
+const store = new Store({ name: 'data' })
+
+/**
+ * radikoの認証処理を行う
+ * @returns 認証情報の入ったリクエストヘッダーと地方のID
+ */
+export const authenticate = async () => {
+  const authKey = 'bcd151073c03b352e1ef2fd66c32209da9ca0afa'
+
+  const headers = {
+    'User-Agent': 'curl/7.52.1',
+    Accept: '*/*',
+    'x-radiko-user': 'user',
+    'x-radiko-app': 'pc_html5',
+    'x-radiko-app-version': '0.0.1',
+    'x-radiko-device': 'pc'
+  }
+
+  const res = await fetch('https://radiko.jp/v2/api/auth1', {
+    method: 'GET',
+    headers
+  }).catch((error) => {
+    console.error(error)
+    return null
+  })
+  if (res == null) {
+    throw new Error('authenticate failed!')
+  }
+
+  // PartialKey生成
+  const authHeaders = res.headers
+  const length = Number(authHeaders.get('x-radiko-keylength'))
+  const offset = Number(authHeaders.get('x-radiko-keyoffset'))
+  const partialkey = Buffer.from(authKey.slice(offset, offset + length)).toString('base64')
+
+  headers['x-radiko-authtoken'] = authHeaders.get('x-radiko-authtoken')
+  headers['x-radiko-partialkey'] = partialkey
+  const areaText = await fetch('https://radiko.jp/v2/api/auth2', {
+    method: 'GET',
+    headers
+  })
+    .then((res2) => res2.text())
+    .catch((error) => {
+      console.error(error)
+      return null
+    })
+  if (areaText == null) {
+    throw new Error('authenticate failed!')
+  }
+
+  // areaIdのみ取り出す(areaTextは'areaId,文字列,文字列'のようなフォーマットになっている)
+  const [areaId, ...rest] = areaText.split(',')
+
+  return {
+    headers,
+    areaId
+  }
+}
+
+export const getStationList = async (): Promise<StationWithProgram[]> => {
+  const { headers, areaId } = await authenticate()
+
+  // radikoのタイムフリーがダウンロードできる範囲
+  const minDate = dayjs().add(-7, 'day').startOf('day')
+  const maxDate = dayjs().startOf('day')
+
+  // TODO これだと、保存データの定義が変わったときにおかしくなるので、型チェック関数を定義する
+  const stationList: StationWithProgram[] = store.get('stationList', []) as StationWithProgram[]
+
+  // ダウンロードできなくなった日付の番組表を消す
+  stationList.forEach((station) => {
+    const keyValueList = Object.entries(station.programMap)
+    // minDateよりも前の日付を除く
+    const filtered = keyValueList.filter(([key, _]) => {
+      const keyDate = getDayjs(key, 'YYYYMMDD')
+      return keyDate.isSame(minDate) || keyDate.isAfter(minDate)
+    })
+    // 元の構造に戻す
+    station.programMap = Object.fromEntries(filtered)
+  })
+
+  // ローカルに番組表が保存されている日付リスト(今は、日付ごとに全ての放送局の番組表を取得しているので、stationList[0].programMapだけ見ておけば、全ての日付を取れる)
+  const storedDateList =
+    stationList.length > 0
+      ? Object.keys(stationList[0].programMap).map((key) => getDayjs(key, 'YYYYMMDD'))
+      : []
+
+  // 保存されていない日付リスト(storedDateListにないのでダウンロードが必要)
+  const dateList = getDateList(minDate, maxDate).filter(
+    (date) => !includesDate(storedDateList, date)
+  )
+  // 並列ダウンロード
+  const programListList = await Promise.all(
+    dateList.map((date) => getProgramList(headers, areaId, date))
+  )
+
+  // APIの仕様上、日付ごとに全ての放送局の番組リストが取得できる。
+  // StationWithProgramに変換する。
+
+  programListList.forEach((programList, index) => {
+    programList.forEach((item) => {
+      let station = stationList.find((r) => r.stationId === item['@_id'])
+      if (station == null) {
+        // 放送局データがなかったので追加
+        stationList.push({
+          stationId: item['@_id'],
+          stationName: item['name'],
+          programMap: {}
+        })
+        station = stationList.find((r) => r.stationId === item['@_id'])
+      }
+
+      // 番組リストを追加する
+      const progList = item?.progs?.prog ?? []
+      const programList = progList.map((program) => {
+        return {
+          programId: program['@_id'],
+          ft: program['@_ft'],
+          to: program['@_to'],
+          title: program['title'],
+          info: program['info'] ?? '',
+          imgPath: program['img'] ?? null
+        } satisfies Program
+      })
+      const date = dateList[index]
+      const dateStr = formatDayjs(date, 'YYYYMMDD')
+
+      station!.programMap[dateStr] = programList
+    })
+  })
+
+  store.set('stationList', stationList)
+
+  return stationList
+}
+
+const getProgramList = async (
+  headers: HeadersInit,
+  areaId: string,
+  date: Dayjs
+): Promise<ProgramListForApi[]> => {
+  // 取得する番組表の日付(番組表は5時区切りになっているので、開始時刻の五時間前の日付の番組表を取ると番組の情報がある)
+  const programDate = date.subtract(5, 'hour')
+  const programDateStr = formatDayjs(programDate, 'YYYYMMDD')
+
+  // 番組表を取得
+  const programList = await fetch(
+    `https://radiko.jp/v3/program/date/${programDateStr}/${areaId}.xml`,
+    {
+      method: 'GET',
+      headers
+    }
+  )
+  const programXml = await programList.text()
+  const programJson = new XMLParser({ ignoreAttributes: false }).parse(programXml)
+
+  const stationList = programJson?.radiko?.stations?.station ?? []
+
+  if (Array.isArray(stationList) && stationList.every(isProgramListForApi)) {
+    return stationList
+  } else {
+    console.error(`failed parse ${areaId}.xml `)
+  }
+  return []
+}
+
+/**
+ * m3u8ファイルをダウンロードするファイルを取得する
+ * @param {*} stationId
+ * @param {*} startAt
+ * @param {*} endAt
+ * @param {*} seek
+ * @returns
+ */
+const getMasterPlayList = async (stationId, startAt, endAt) => {
+  const params = new URLSearchParams()
+  params.set('station_id', stationId)
+  params.set('start_at', startAt)
+  params.set('ft', startAt)
+  params.set('end_at', endAt)
+  params.set('to', endAt)
+  // 固定で大丈夫か?
+  params.set('l', '15')
+  params.set('lsid', 'a9ed540183dde886192a9095546ae668')
+  params.set('type', 'b')
+
+  return `https://radiko.jp/v2/api/ts/playlist.m3u8?${params.toString()}`
+}
+
+const downloadStore: Record<string, number> = {}
+
+// TODO グローバル変数でダウンロード状況を持っているが、この書き方で問題ないのだろうか
+export const getDownloadProgress = (key) => downloadStore[key]
+
+export const downloadAudio = async (stationId, startAt, endAt, outputFileName) => {
+  // m3u8ファイルを取得する
+  // ただし、m3u8ファイルには「音声ファイルのリンク」はなく、「音声ファイルのリンクへのリンク」が記述されている。
+  const { headers } = await authenticate()
+  const playListUrl = await getMasterPlayList(stationId, startAt, endAt)
+
+  const key = `${stationId}-${startAt}`
+  downloadStore[key] = 0
+  const tmpdir = fs.mkdtempSync(`${os.tmpdir()}/${key}`)
+  const tmpFile = `${tmpdir}/test.wav`
+
+  let totalTime
+
+  ffmpeg()
+    .input(playListUrl)
+    .inputOption('-headers', `X-Radiko-Authtoken: ${headers['x-radiko-authtoken']}`)
+    .output(tmpFile)
+
+    .on('codecData', (data) => {
+      totalTime = parseInt(data.duration.replace(/:/g, ''))
+    })
+    .on('progress', (progress) => {
+      const time = parseInt(progress.timemark.replace(/:/g, ''))
+      const percent = (time / totalTime) * 100
+      downloadStore[key] = percent
+    })
+    .on('end', async () => {
+      downloadStore[key] = 100
+      fs.copyFileSync(tmpFile, outputFileName)
+      fs.rmSync(tmpdir, {
+        recursive: true,
+        force: true
+      })
+    })
+    .run()
+
+  return key
+}
