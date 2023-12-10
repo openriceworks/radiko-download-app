@@ -38,21 +38,42 @@ function ProgramCardHeader(program: ProgramForCard): JSX.Element {
 }
 
 function formatDateRange(fromDate: Dayjs, toDate: Dayjs): string {
-  // TODO 本当は5:00区切りで日付を変えたい 2023/01/02 1:00 -> 2023/01/01 25:00 みたいな
-  const fromDatePattern = 'YYYY/MM/DD hh:mm'
-  let toDatePattern = 'YYYY/MM/DD hh:mm'
+  const fromDatePattern = 'YYYY/MM/DD '
 
-  if (fromDate.get('year') === toDate.get('year')) {
-    toDatePattern = 'MM/DD hh:mm'
-    if (fromDate.get('month') === toDate.get('month')) {
-      toDatePattern = 'DD hh:mm'
-      if (fromDate.get('day') == toDate.get('day')) {
-        toDatePattern = 'hh:mm'
+  const fromDateVisible = fromDate.clone().subtract(fromDate.get('hour') < 5 ? 1 : 0, 'day')
+  const fromTimeVisible = {
+    hour: fromDate.get('hour') + (fromDate.get('hour') < 5 ? 24 : 0),
+    minutes: fromDate.get('minute')
+  }
+
+  const toDateVisible = toDate.clone().subtract(toDate.get('hour') < 5 ? 1 : 0, 'day')
+  const toTimeVisible = {
+    hour: toDate.get('hour') + (toDate.get('hour') < 5 ? 24 : 0),
+    minutes: toDate.get('minute')
+  }
+
+  let toDatePattern = 'YYYY/MM/DD '
+  if (fromDateVisible.get('year') === toDateVisible.get('year')) {
+    toDatePattern = 'MM/DD '
+    if (fromDateVisible.get('month') === toDateVisible.get('month')) {
+      // 月だけの省略はしない
+      if (fromDateVisible.get('day') == toDateVisible.get('day')) {
+        toDatePattern = ''
       }
     }
   }
+  const fromDateStr = fromDateVisible.format(fromDatePattern)
+  const fromHourStr =
+    fromTimeVisible.hour > 9 ? `${fromTimeVisible.hour}` : `0${fromTimeVisible.hour}`
+  const fromMinuteHour =
+    fromTimeVisible.minutes > 9 ? `${fromTimeVisible.minutes}` : `0${fromTimeVisible.minutes}`
 
-  return `${fromDate.format(fromDatePattern)} - ${toDate.format(toDatePattern)}`
+  const toDateStr = toDatePattern !== '' ? toDateVisible.format(toDatePattern) : ''
+  const toHourStr = toTimeVisible.hour > 9 ? `${toTimeVisible.hour}` : `0${toTimeVisible.hour}`
+  const toMinuteHour =
+    toTimeVisible.minutes > 9 ? `${toTimeVisible.minutes}` : `0${toTimeVisible.minutes}`
+
+  return `${fromDateStr}${fromHourStr}:${fromMinuteHour} - ${toDateStr}${toHourStr}:${toMinuteHour}`
 }
 
 function ProgramCardDescription(program: ProgramForCard): JSX.Element {
@@ -69,7 +90,7 @@ export default function ProgramCard(props: Props): JSX.Element {
   const styles = useStyles()
   const { downloadAudio, progress, isDownloading } = useDownloadAudio()
 
-  const FooterContent = () => {
+  const FooterContent = (): JSX.Element => {
     if (isDownloading) {
       return (
         <Field validationMessage="ダウンロード中" validationState="none" style={{ width: '100%' }}>
