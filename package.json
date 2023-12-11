@@ -25,6 +25,7 @@
     "@fluentui/react-components": "^9.42.0",
     "@fluentui/react-icons": "^2.0.223",
     "@tanstack/react-query": "^5.12.2",
+    "ajv": "^8.12.0",
     "dayjs": "^1.11.10",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",

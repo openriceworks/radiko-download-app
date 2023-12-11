@@ -5,10 +5,13 @@ import icon from '../../resources/icon.png?asset'
 import { downloadAudio, getDownloadProgress, getStationList } from './radiko'
 import { ProgramForCard } from '../shared/types'
 
+// https://qiita.com/jumbOrNot/items/e19055700f59124556c0
+process.env['PATH'] += ':/usr/local/bin/'
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 960,
+    width: 1080,
     height: 670,
     show: false,
     autoHideMenuBar: true,
@@ -26,23 +29,6 @@ function createWindow(): void {
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
-  })
-
-  ipcMain.handle('getStationList', async () => {
-    return await getStationList()
-  })
-
-  ipcMain.handle('downloadAudio', async (event, program: ProgramForCard) => {
-    return await downloadAudio(
-      program.stationId,
-      program.ft,
-      program.to,
-      app.getPath('downloads') + `/${program.title}.wav`
-    )
-  })
-
-  ipcMain.handle('getProgress', (event, key) => {
-    return getDownloadProgress(key)
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -88,3 +74,19 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
+ipcMain.handle('getStationList', async () => {
+  return await getStationList()
+})
+
+ipcMain.handle('downloadAudio', async (event, program: ProgramForCard) => {
+  return await downloadAudio(
+    program.stationId,
+    program.ft,
+    program.to,
+    app.getPath('downloads') + `/${program.title}.wav`
+  )
+})
+
+ipcMain.handle('getProgress', (event, key) => {
+  return getDownloadProgress(key)
+})
