@@ -5,7 +5,6 @@ import LabeledInput from '../Elements/LabledInput'
 import { makeStyles, shorthands } from '@fluentui/react-components'
 import { SearchParam, StationWithProgram } from 'src/shared/types'
 
-
 interface Props {
   stationList: StationWithProgram[]
   value: SearchParam

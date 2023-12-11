@@ -18,7 +18,6 @@ const useStyles = makeStyles({
     // 左端のカードのborderが切れるので1pxずらす
     marginLeft: '1px',
     marginRight: '1px'
-
   }
 })
 
@@ -54,6 +53,7 @@ export default function ProgramScrollView(props: Props): JSX.Element {
     programListList[programListList.length - 1].push(program)
   })
 
+  // TODO 変更が即時反映されてしまうが、アニメーションはあった方がいいのだろうか。
   return (
     <VirtualizerScrollView
       numItems={programListList.length}
@@ -61,7 +61,7 @@ export default function ProgramScrollView(props: Props): JSX.Element {
       itemSize={400}
       container={{
         role: 'list',
-        style: { width: 'fit-content', height: props.height, gap: '0.5rem'}
+        style: { width: 'fit-content', height: props.height, gap: '0.5rem' }
       }}
     >
       {(index: number) => {
