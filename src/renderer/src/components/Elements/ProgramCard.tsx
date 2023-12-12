@@ -11,7 +11,7 @@ import {
   ProgressBar,
   Field
 } from '@fluentui/react-components'
-import { ArrowDownload24Regular } from '@fluentui/react-icons'
+import { ArrowDownload24Regular, CompassNorthwestFilled } from '@fluentui/react-icons'
 import { ProgramForCard } from 'src/shared/types'
 import { getDayjs } from '../../../../shared/util'
 import { Dayjs } from 'dayjs'
@@ -88,31 +88,31 @@ function ProgramCardDescription(program: ProgramForCard): JSX.Element {
 
 export default function ProgramCard(props: Props): JSX.Element {
   const styles = useStyles()
-  const { downloadAudio, progress, isDownloading } = useDownloadAudio()
+  const { downloadAudio, result} = useDownloadAudio(props.program)
 
   const FooterContent = (): JSX.Element => {
-    if (isDownloading) {
+    if (result.progress != null && result.progress < 100) {
       return (
         <Field validationMessage="ダウンロード中" validationState="none" style={{ width: '100%' }}>
-          <ProgressBar value={progress / 100} />
+          <ProgressBar value={result.progress / 100} />
         </Field>
       )
     }
 
-    if (progress === 100) {
+    if (result.progress === 100) {
       return (
         <Field
           validationMessage="ダウンロードしました"
           validationState="success"
           style={{ width: '100%' }}
         >
-          <ProgressBar value={progress / 100} />
+          <ProgressBar value={result.progress / 100} />
         </Field>
       )
     }
 
     return (
-      <Button icon={<ArrowDownload24Regular />} onClick={() => downloadAudio(props.program)}>
+      <Button icon={<ArrowDownload24Regular />} onClick={() => downloadAudio()}>
         ダウンロード
       </Button>
     )

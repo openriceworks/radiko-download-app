@@ -24,7 +24,6 @@ export interface Program {
   // 説明
   info: string
   // 画像
-  // TODO rendererでダウンロードできないので、画像をダウンロードしてbase64を渡したほうがいいかも
   imgPath: string | null
   // TODO タグ
   // TODO ジャンル
@@ -103,4 +102,9 @@ export const isProgramForApi = (data: unknown): data is ProgramForApi => {
   }
 
   return true
+}
+
+export interface DownloadResult {
+  path: string | undefined
+  progress: number
 }

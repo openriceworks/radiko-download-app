@@ -1,13 +1,38 @@
 import Store from 'electron-store'
-import { StationWithProgram } from '../shared/types'
+import { DownloadResult, StationWithProgram } from '../shared/types'
+
+interface StoreType {
+  stationList: StationWithProgram[]
+  downloadResult: Record<string, DownloadResult>
+}
 
 // NOTE : electron-storeへのアクセスこのファイルのみで行う
-const store = new Store({ name: 'data' })
+const store = new Store<StoreType>({ name: 'data' })
 
 export const getStationList = () => {
   // TODO これだと、保存データの定義が変わったときにおかしくなるので、型チェック関数を定義する
-  return store.get('stationList', []) as StationWithProgram[]
+  return store.get('stationList', [])
 }
 export const setStationList = (stationList: StationWithProgram[]) => {
   store.set('stationList', stationList)
+}
+
+export const getDownloadResult = (
+  stationId: string,
+  startAt: string
+): DownloadResult | undefined => {
+  const key = `${stationId}-${startAt}`
+  const resultStore = store.get('downloadResult') ?? {}
+  return resultStore[key]
+}
+
+export const setDownloadResult = (
+  stationId: string,
+  startAt: string,
+  downloadResult: DownloadResult
+) => {
+  const resultStore = store.get('downloadResult') ?? {}
+  const key = `${stationId}-${startAt}`
+  resultStore[key] = downloadResult
+  store.set('downloadResult', resultStore)
 }

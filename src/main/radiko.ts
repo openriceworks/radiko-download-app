@@ -198,20 +198,18 @@ const getMasterPlayList = async (stationId, startAt, endAt) => {
   return `https://radiko.jp/v2/api/ts/playlist.m3u8?${params.toString()}`
 }
 
-const downloadStore: Record<string, number> = {}
-
-// TODO グローバル変数でダウンロード状況を持っているが、この書き方で問題ないのだろうか
-export const getDownloadProgress = (key) => downloadStore[key]
-
 export const downloadAudio = async (stationId, startAt, endAt, outputFileName) => {
   // m3u8ファイルを取得する
   // ただし、m3u8ファイルには「音声ファイルのリンク」はなく、「音声ファイルのリンクへのリンク」が記述されている。
   const { headers } = await authenticate()
   const playListUrl = await getMasterPlayList(stationId, startAt, endAt)
 
-  const key = `${stationId}-${startAt}`
-  downloadStore[key] = 0
-  const tmpdir = fs.mkdtempSync(`${os.tmpdir()}/${key}`)
+  store.setDownloadResult(stationId, startAt, {
+    path: undefined,
+    progress: 0
+  })
+
+  const tmpdir = fs.mkdtempSync(`${os.tmpdir()}/${stationId}-${startAt}`)
   const tmpFile = `${tmpdir}/test.wav`
 
   let totalTime
@@ -227,17 +225,22 @@ export const downloadAudio = async (stationId, startAt, endAt, outputFileName) =
     .on('progress', (progress) => {
       const time = parseInt(progress.timemark.replace(/:/g, ''))
       const percent = (time / totalTime) * 100
-      downloadStore[key] = percent
+      store.setDownloadResult(stationId, startAt, {
+        path: undefined,
+        progress: percent
+      })
     })
     .on('end', async () => {
-      downloadStore[key] = 100
       fs.copyFileSync(tmpFile, outputFileName)
       fs.rmSync(tmpdir, {
         recursive: true,
         force: true
       })
+
+      store.setDownloadResult(stationId, startAt, {
+        path: outputFileName,
+        progress: 100
+      })
     })
     .run()
-
-  return key
 }

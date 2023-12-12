@@ -1,27 +1,24 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { ProgramForCard } from 'src/shared/types'
+import { DownloadResult, ProgramForCard } from 'src/shared/types'
 
-export const useDownloadAudio = () => {
-  const [progressId, setProgressId] = useState<string | undefined>()
+export const useDownloadAudio = (program: ProgramForCard) => {
+  const [enabled, setEnabled] = useState(false)
 
-  const downloadAudio = async (program: ProgramForCard) => {
-    const key = await window.electron.ipcRenderer.invoke('downloadAudio', program)
-    setProgressId(key)
+  const downloadAudio = async () => {
+    await window.electron.ipcRenderer.invoke('downloadAudio', program)
+    setEnabled(true)
   }
 
-  const { data: progress } = useQuery({
-    queryKey: ['downloadProgress', progressId],
+  const { data: downloadResult } = useQuery<Partial<DownloadResult>>({
+    enabled,
+    queryKey: ['downloadProgress', program.stationId, program.ft, enabled],
     queryFn: async (context) => {
-      const key = context.queryKey[1]
-      if (key != null) {
-        return window.electron.ipcRenderer.invoke('getProgress', key)
-      }
-      return undefined
+      return window.electron.ipcRenderer.invoke('getProgress', program).then((res) => res ?? {})
     },
-    initialData: 0,
-    refetchInterval: ({ queryKey, state }) => {
-      if (queryKey[1] != null && state.data < 100) {
+    initialData: {},
+    refetchInterval: ({ state }) => {
+      if (state.data == null || state.data.path == null) {
         return 100
       }
       return Infinity
@@ -30,7 +27,6 @@ export const useDownloadAudio = () => {
 
   return {
     downloadAudio,
-    progress,
-    isDownloading: progressId != null && progress < 100
+    result: downloadResult
   }
 }

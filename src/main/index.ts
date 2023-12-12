@@ -2,8 +2,9 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { downloadAudio, getDownloadProgress, getStationList } from './radiko'
+import { downloadAudio, getStationList } from './radiko'
 import { ProgramForCard } from '../shared/types'
+import * as store from './store'
 
 // https://qiita.com/jumbOrNot/items/e19055700f59124556c0
 process.env['PATH'] += ':/usr/local/bin/'
@@ -87,6 +88,6 @@ ipcMain.handle('downloadAudio', async (event, program: ProgramForCard) => {
   )
 })
 
-ipcMain.handle('getProgress', (event, key) => {
-  return getDownloadProgress(key)
+ipcMain.handle('getProgress', (event, program: ProgramForCard) => {
+  return store.getDownloadResult(program.stationId, program.ft)
 })
