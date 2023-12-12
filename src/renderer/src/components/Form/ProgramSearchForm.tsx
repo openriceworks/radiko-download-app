@@ -29,14 +29,14 @@ const ProgramSearchForm = (props: Props) => {
 
   const setKeyword = (keyword: string) => {
     props.setValue({
+      ...props.value,
       keyword,
-      date: props.value.date
     })
   }
 
   const setDate = (date: string) => {
     props.setValue({
-      keyword: props.value.keyword,
+      ...props.value,
       date
     })
   }
@@ -57,7 +57,7 @@ const ProgramSearchForm = (props: Props) => {
         onChange={(e) => setDate(e.target.value)}
         defaultValue=""
       >
-        <option value=""></option>
+        <option value="">すべて</option>
         {optionList}
       </LabeledSelect>
     </div>
