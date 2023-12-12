@@ -9,11 +9,8 @@ import { XMLParser } from 'fast-xml-parser'
 import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs'
 import os from 'os'
-
-import Store from 'electron-store'
 import { formatDayjs, getDateList, getDayjs, includesDate } from '../shared/util'
-
-const store = new Store({ name: 'data' })
+import * as store from './store'
 
 /**
  * radikoの認証処理を行う
@@ -79,8 +76,7 @@ export const getStationList = async (): Promise<StationWithProgram[]> => {
   const minDate = dayjs().add(-7, 'day').startOf('day')
   const maxDate = dayjs().startOf('day')
 
-  // TODO これだと、保存データの定義が変わったときにおかしくなるので、型チェック関数を定義する
-  const stationList: StationWithProgram[] = store.get('stationList', []) as StationWithProgram[]
+  const stationList = store.getStationList()
 
   // ダウンロードできなくなった日付の番組表を消す
   stationList.forEach((station) => {
@@ -144,7 +140,7 @@ export const getStationList = async (): Promise<StationWithProgram[]> => {
     })
   })
 
-  store.set('stationList', stationList)
+  store.setStationList(stationList)
 
   return stationList
 }
