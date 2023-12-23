@@ -1,11 +1,13 @@
-import { VirtualizerScrollView } from '@fluentui/react-components/unstable'
+import { ScrollToInterface, VirtualizerScrollView } from '@fluentui/react-components/unstable'
 import { Body2, Title3, makeStyles } from '@fluentui/react-components'
 import { ProgramForCard } from 'src/shared/types'
 import ProgramCard from './ProgramCard'
+import { RefObject } from 'react'
 
 interface Props {
   programList: ProgramForCard[]
   height: string
+  scrollRef?: RefObject<ScrollToInterface>
 }
 
 const useStyles = makeStyles({
@@ -56,6 +58,7 @@ export default function ProgramScrollView(props: Props): JSX.Element {
   // TODO 変更が即時反映されてしまうが、アニメーションはあった方がいいのだろうか。
   return (
     <VirtualizerScrollView
+      imperativeRef={props.scrollRef}
       numItems={programListList.length}
       // height: 400px
       itemSize={400}
