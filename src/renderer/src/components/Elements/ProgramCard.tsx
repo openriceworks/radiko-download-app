@@ -16,6 +16,7 @@ import { DownloadResult, ProgramForCard } from 'src/shared/types'
 import { getDayjs } from '../../../../shared/util'
 import dayjs, { Dayjs } from 'dayjs'
 import { useDownloadAudio } from '@renderer/hooks/useDownloadAudio'
+import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   program: ProgramForCard
@@ -147,24 +148,44 @@ function ProgramCardFooter(props: {
 
 export default function ProgramCard(props: Props): JSX.Element {
   const styles = useStyles()
-  const { downloadAudio, result } = useDownloadAudio(props.program)
+  const { downloadAudio, result, getProgress } = useDownloadAudio(props.program)
+
+  const ref = useRef<HTMLDivElement>(null!)
+
+  // 表示領域に入ってからダウンロード済み情報を取得する
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry && entry.isIntersecting) {
+        getProgress()
+        observer.unobserve(entry.target)
+      }
+    })
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
 
   return (
-    <Card className={styles.card}>
-      {/* 16:10のアスペクト比の画像に合わせている */}
-      <CardPreview style={{ width: '320px', height: '200px' }}>
-        <Image src={props.program.imgPath ?? undefined} />
-      </CardPreview>
-      <div style={{ height: '56px' }}>
-        <CardHeader
-          header={ProgramCardHeader(props.program)}
-          description={ProgramCardDescription(props.program)}
-        />
-      </div>
+    <div ref={ref}>
+      <Card className={styles.card}>
+        {/* 16:10のアスペクト比の画像に合わせている */}
+        <CardPreview style={{ width: '320px', height: '200px' }}>
+          <Image src={props.program.imgPath ?? undefined} loading="lazy" />
+        </CardPreview>
+        <div style={{ height: '56px' }}>
+          <CardHeader
+            header={ProgramCardHeader(props.program)}
+            description={ProgramCardDescription(props.program)}
+          />
+        </div>
 
-      <CardFooter>
-        <ProgramCardFooter result={result} onDownload={downloadAudio} />
-      </CardFooter>
-    </Card>
+        <CardFooter>
+          <ProgramCardFooter result={result} onDownload={downloadAudio} />
+        </CardFooter>
+      </Card>
+    </div>
   )
 }
