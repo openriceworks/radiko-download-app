@@ -1,10 +1,11 @@
 import { makeStyles, Spinner } from '@fluentui/react-components'
-import { useStationList } from '@renderer/hooks/useStationList'
+import { useStationProgramList } from '@renderer/hooks/useStationProgramList'
 import { useState } from 'react'
 import { SearchParam } from '../../../../shared/types'
 import { filterProgramList } from '../../../../shared/util'
 import ProgramScrollView from '../Elements/ProgramScrollView'
 import ProgramSearchForm from '../Form/ProgramSearchForm'
+import { useStationList } from '@renderer/hooks/useStationList'
 
 const useStyles = makeStyles({
   root: {
@@ -26,13 +27,16 @@ const useLoadingStyles = makeStyles({
 })
 
 export default function MainLayout(): JSX.Element {
-  const { isFetching, stationList } = useStationList()
-  const [searchParam, setSearchParam] = useState<SearchParam>({ keyword: '', date: '' })
+  const { isFetching: isFetchingStation, stationList } = useStationList()
+  const { isFetching: isFetchingProgram, stationProgramList } = useStationProgramList()
+  const [searchParam, setSearchParam] = useState<SearchParam>({ keyword: '', date: '', stationId: '' })
 
-  const programList = filterProgramList(stationList, searchParam)
+  const programList = filterProgramList(stationProgramList, searchParam)
 
   // = 全体の高さ - ProgramSearchFormの高さ(54px) - classesの上下のpadding(2rem) - ProgramScrollViewのmarginTop(1rem)
   const programScrollViewHeight = 'calc(100vh - 54px - 2rem - 1rem)'
+
+  const isFetching = isFetchingStation || isFetchingProgram
 
   if (isFetching) {
     const classes = useLoadingStyles()
@@ -45,7 +49,8 @@ export default function MainLayout(): JSX.Element {
     return (
       <div className={useStyles().root}>
         <ProgramSearchForm
-          stationList={stationList}
+          stationsList={stationList}
+          stationProgramList={stationProgramList}
           value={searchParam}
           setValue={setSearchParam}
         />

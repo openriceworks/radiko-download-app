@@ -29,9 +29,15 @@ export const includesDate = (dateList: Dayjs[], date: Dayjs) => {
 
 export const filterProgramList = (stationList: StationWithProgram[], searchParam: SearchParam) => {
   let programList: ProgramForCard[] = []
+
+  const filterStationList =
+    searchParam.stationId !== ''
+      ? stationList.filter((station) => station.stationId === searchParam.stationId)
+      : stationList
+
   if (searchParam.date !== '') {
     programList.push(
-      ...stationList.flatMap((station) =>
+      ...filterStationList.flatMap((station) =>
         station.programMap[searchParam.date].flatMap((val) => ({
           ...val,
           stationId: station.stationId,
@@ -41,7 +47,7 @@ export const filterProgramList = (stationList: StationWithProgram[], searchParam
     )
   } else {
     programList.push(
-      ...stationList.flatMap((station) =>
+      ...filterStationList.flatMap((station) =>
         Object.values(station.programMap)
           .flatMap((val) => val)
           .map((val) => ({

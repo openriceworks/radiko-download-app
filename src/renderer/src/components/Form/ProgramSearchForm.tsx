@@ -3,10 +3,11 @@ import dayjs from 'dayjs'
 import LabeledSelect from '../Elements/LabeledSelect'
 import LabeledInput from '../Elements/LabledInput'
 import { makeStyles, shorthands } from '@fluentui/react-components'
-import { SearchParam, StationWithProgram } from 'src/shared/types'
+import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
 
 interface Props {
-  stationList: StationWithProgram[]
+  stationsList: StationInfo[]
+  stationProgramList: StationWithProgram[]
   value: SearchParam
   setValue: (SearchParam) => void
 }
@@ -20,24 +21,23 @@ const useStyles = makeStyles({
 })
 
 const ProgramSearchForm = (props: Props) => {
-  const programMap = props.stationList[0]?.programMap ?? {}
-  const optionList = Object.keys(programMap).map((date) => (
+  const stationOptionList = props.stationsList.map((station) => (
+    <option key={station.stationId} value={station.stationId}>
+      {station.stationName}
+    </option>
+  ))
+
+  const programMap = props.stationProgramList[0]?.programMap ?? {}
+  const dateOptionList = Object.keys(programMap).map((date) => (
     <option key={date} value={date}>
       {dayjs(date).format('MM月DD日')}
     </option>
   ))
 
-  const setKeyword = (keyword: string) => {
+  const setValue = (key: keyof SearchParam, value: string) => {
     props.setValue({
       ...props.value,
-      keyword,
-    })
-  }
-
-  const setDate = (date: string) => {
-    props.setValue({
-      ...props.value,
-      date
+      [key]: value
     })
   }
 
@@ -49,16 +49,25 @@ const ProgramSearchForm = (props: Props) => {
         label="キーワード"
         contentBefore={<Search24Regular />}
         value={props.value.keyword}
-        onChange={(e) => setKeyword(e.target.value)}
+        onChange={(e) => setValue('keyword', e.target.value)}
       />
       <LabeledSelect
         label="日付"
         value={props.value.date}
-        onChange={(e) => setDate(e.target.value)}
+        onChange={(e) => setValue('date', e.target.value)}
         defaultValue=""
       >
         <option value="">すべて</option>
-        {optionList}
+        {dateOptionList}
+      </LabeledSelect>
+      <LabeledSelect
+        label="放送局"
+        value={props.value.stationId}
+        onChange={(e) => setValue('stationId', e.target.value)}
+        defaultValue=""
+      >
+        <option value="">すべて</option>
+        {stationOptionList}
       </LabeledSelect>
     </div>
   )

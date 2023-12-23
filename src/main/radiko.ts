@@ -2,6 +2,8 @@ import dayjs, { Dayjs } from 'dayjs'
 import {
   Program,
   ProgramListForApi,
+  StationInfo,
+  StationInfoForApi,
   StationWithProgram,
   isProgramListForApi
 } from '../shared/types'
@@ -69,17 +71,39 @@ export const authenticate = async () => {
   }
 }
 
-export const getStationList = async (): Promise<StationWithProgram[]> => {
+export const getStationInfoList = async (): Promise<StationInfo[]> => {
+  const { headers, areaId } = await authenticate()
+  const url = `https://radiko.jp/v3/station/list/${areaId}.xml`
+
+  const stationList = await fetch(url, {
+    method: 'GET',
+    headers
+  })
+  const stationXml = await stationList.text()
+  const stationJson = new XMLParser({ ignoreAttributes: false }).parse(
+    stationXml
+  ) as StationInfoForApi
+
+  return stationJson.stations.station.map((station) => {
+    return {
+      stationId: station.id,
+      stationName: station.name,
+      bannerImgPath: station.banner
+    } satisfies StationInfo
+  })
+}
+
+export const getStationProgramList = async (): Promise<StationWithProgram[]> => {
   const { headers, areaId } = await authenticate()
 
   // radikoのタイムフリーがダウンロードできる範囲
   const minDate = dayjs().add(-7, 'day').startOf('day')
   const maxDate = dayjs().startOf('day')
 
-  const stationList = store.getStationList()
+  const stationProgramList = store.getStationProgramList()
 
   // ダウンロードできなくなった日付の番組表を消す
-  stationList.forEach((station) => {
+  stationProgramList.forEach((station) => {
     const keyValueList = Object.entries(station.programMap)
     // minDateよりも前の日付を除く
     const filtered = keyValueList.filter(([key, _]) => {
@@ -92,8 +116,8 @@ export const getStationList = async (): Promise<StationWithProgram[]> => {
 
   // ローカルに番組表が保存されている日付リスト(今は、日付ごとに全ての放送局の番組表を取得しているので、stationList[0].programMapだけ見ておけば、全ての日付を取れる)
   const storedDateList =
-    stationList.length > 0
-      ? Object.keys(stationList[0].programMap).map((key) => getDayjs(key, 'YYYYMMDD'))
+    stationProgramList.length > 0
+      ? Object.keys(stationProgramList[0].programMap).map((key) => getDayjs(key, 'YYYYMMDD'))
       : []
 
   // 保存されていない日付リスト(storedDateListにないのでダウンロードが必要)
@@ -110,15 +134,15 @@ export const getStationList = async (): Promise<StationWithProgram[]> => {
 
   programListList.forEach((programList, index) => {
     programList.forEach((item) => {
-      let station = stationList.find((r) => r.stationId === item['@_id'])
+      let station = stationProgramList.find((r) => r.stationId === item['@_id'])
       if (station == null) {
         // 放送局データがなかったので追加
-        stationList.push({
+        stationProgramList.push({
           stationId: item['@_id'],
           stationName: item['name'],
           programMap: {}
         })
-        station = stationList.find((r) => r.stationId === item['@_id'])
+        station = stationProgramList.find((r) => r.stationId === item['@_id'])
       }
 
       // 番組リストを追加する
@@ -140,9 +164,9 @@ export const getStationList = async (): Promise<StationWithProgram[]> => {
     })
   })
 
-  store.setStationList(stationList)
+  store.setStationProgramList(stationProgramList)
 
-  return stationList
+  return stationProgramList
 }
 
 const getProgramList = async (

@@ -2,21 +2,21 @@ import Store from 'electron-store'
 import { DownloadResult, StationWithProgram } from '../shared/types'
 
 interface StoreType {
-  stationList: StationWithProgram[]
+  stationProgramList: StationWithProgram[]
   downloadResult: Record<string, DownloadResult>
 }
 
 // NOTE : electron-storeへのアクセスこのファイルのみで行う
 const store = new Store<StoreType>({ name: 'data' })
 
-export const getStationList = () => {
+export const getStationProgramList = () => {
   // TODO areaIdが変わったときに全て取り直す機能が必要
 
   // TODO これだと、保存データの定義が変わったときにおかしくなるので、型チェック関数を定義する
-  return store.get('stationList', [])
+  return store.get('stationProgramList', [])
 }
-export const setStationList = (stationList: StationWithProgram[]) => {
-  store.set('stationList', stationList)
+export const setStationProgramList = (stationProgramList: StationWithProgram[]) => {
+  store.set('stationProgramList', stationProgramList)
 }
 
 export const getDownloadResult = (

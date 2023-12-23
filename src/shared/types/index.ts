@@ -1,6 +1,14 @@
 export interface SearchParam {
   keyword: string
   date: string
+  stationId: string
+}
+
+export interface StationInfo {
+  stationId: string
+  stationName: string
+
+  bannerImgPath: string
 }
 
 // 放送局の情報
@@ -33,6 +41,20 @@ export interface ProgramForCard extends Program {
   stationId: string
   stationName: string
 }
+
+// radiko放送局リストのxmlをjsonに変換した時の型
+export interface StationInfoForApi {
+  stations: {
+    '@_area_id': string
+    station: {
+      id: string
+      name: string
+      banner: string
+    }[]
+  }
+}
+
+// TODO isStationInfoApi
 
 // radiko番組表xmlをjsonに変換した時の型
 export interface ProgramListForApi {
