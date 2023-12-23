@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -80,12 +80,30 @@ ipcMain.handle('getStationList', async () => {
 })
 
 ipcMain.handle('downloadAudio', async (event, program: ProgramForCard) => {
-  return await downloadAudio(
-    program.stationId,
-    program.ft,
-    program.to,
-    app.getPath('downloads') + `/${program.title}.wav`
-  )
+  if (BrowserWindow.getAllWindows().length === 0) {
+    return
+  }
+  const mainWindow = BrowserWindow.getAllWindows[0]
+
+  const defaultPath = app.getPath('downloads') + `/${program.title}.wav`
+
+  // ダウンロード先を指定するダイアログを表示
+  const filePath = dialog.showSaveDialogSync(mainWindow, {
+    defaultPath,
+    filters: [
+      {
+        name: '*',
+        extensions: ['wav']
+      }
+    ]
+  })
+
+  // キャンセルされたのでダウンロードしない
+  if (filePath === undefined) {
+    return
+  }
+
+  return await downloadAudio(program.stationId, program.ft, program.to, filePath)
 })
 
 ipcMain.handle('getProgress', (event, program: ProgramForCard) => {
