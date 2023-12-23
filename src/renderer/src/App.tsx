@@ -1,4 +1,5 @@
-import { makeStyles } from '@fluentui/react-components'
+import { FluentProvider, webLightTheme } from '@fluentui/react-components'
+import { makeStyles, tokens } from '@fluentui/react-components'
 import MainLayout from './components/Layout/MainLayout'
 
 const useStyles = makeStyles({
@@ -9,18 +10,31 @@ const useStyles = makeStyles({
     marginBottom: '0',
     marginLeft: 'auto',
     marginRight: 'auto',
-    textAlign: 'center',
-    color: '#605e5c'
+    textAlign: 'center'
+  }
+})
+
+const useRootStyles = makeStyles({
+  root: {
+    width: '100%',
+    height: '100%',
+    color: tokens.colorNeutralForeground2,
+    backgroundColor: tokens.colorNeutralBackground2
   }
 })
 
 function App(): JSX.Element {
   const classes = useStyles()
+  const rootClasses = useRootStyles()
 
   return (
-    <div className={classes.root}>
-      <MainLayout />
-    </div>
+    <FluentProvider theme={webLightTheme}>
+      <div className={rootClasses.root}>
+        <div className={classes.root}>
+          <MainLayout />
+        </div>
+      </div>
+    </FluentProvider>
   )
 }
 
