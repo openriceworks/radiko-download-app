@@ -206,7 +206,8 @@ export const downloadAudio = async (stationId, startAt, endAt, outputFileName) =
 
   store.setDownloadResult(stationId, startAt, {
     path: undefined,
-    progress: 0
+    progress: 0,
+    downloadDate: null
   })
 
   const tmpdir = fs.mkdtempSync(`${os.tmpdir()}/${stationId}-${startAt}`)
@@ -227,7 +228,8 @@ export const downloadAudio = async (stationId, startAt, endAt, outputFileName) =
       const percent = (time / totalTime) * 100
       store.setDownloadResult(stationId, startAt, {
         path: undefined,
-        progress: percent
+        progress: percent,
+        downloadDate: null
       })
     })
     .on('end', async () => {
@@ -239,8 +241,11 @@ export const downloadAudio = async (stationId, startAt, endAt, outputFileName) =
 
       store.setDownloadResult(stationId, startAt, {
         path: outputFileName,
-        progress: 100
+        progress: 100,
+        downloadDate: formatDayjs(dayjs(), 'YYYYMMDDhhmmss')
       })
     })
     .run()
+
+  return true
 }

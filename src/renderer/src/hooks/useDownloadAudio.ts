@@ -1,18 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DownloadResult, ProgramForCard } from 'src/shared/types'
 
 export const useDownloadAudio = (program: ProgramForCard) => {
-  const [enabled, setEnabled] = useState(false)
+  const [enabled, setEnabled] = useState(true)
 
   const downloadAudio = async () => {
-    await window.electron.ipcRenderer.invoke('downloadAudio', program)
-    setEnabled(true)
+    const isStarted = await window.electron.ipcRenderer.invoke('downloadAudio', program)
+    setEnabled(isStarted)
   }
 
   const { data: downloadResult } = useQuery<Partial<DownloadResult>>({
     enabled,
-    queryKey: ['downloadProgress', program.stationId, program.ft, enabled],
+    queryKey: ['downloadProgress', program.stationId, program.ft],
     queryFn: async (context) => {
       return window.electron.ipcRenderer.invoke('getProgress', program).then((res) => res ?? {})
     },
@@ -24,6 +24,22 @@ export const useDownloadAudio = (program: ProgramForCard) => {
       return Infinity
     }
   })
+
+  useEffect(() => {
+    setEnabled(false)
+  }, [])
+
+  useEffect(() => {
+    if (!enabled) {
+      if (
+        downloadResult.progress != null &&
+        0 < downloadResult.progress &&
+        downloadResult.progress < 100
+      ) {
+        setEnabled(true)
+      }
+    }
+  }, [downloadResult])
 
   return {
     downloadAudio,

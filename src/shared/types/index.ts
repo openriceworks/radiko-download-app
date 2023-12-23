@@ -107,4 +107,5 @@ export const isProgramForApi = (data: unknown): data is ProgramForApi => {
 export interface DownloadResult {
   path: string | undefined
   progress: number
+  downloadDate: string | null
 }

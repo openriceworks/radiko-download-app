@@ -10,6 +10,8 @@ interface StoreType {
 const store = new Store<StoreType>({ name: 'data' })
 
 export const getStationList = () => {
+  // TODO areaIdが変わったときに全て取り直す機能が必要
+
   // TODO これだと、保存データの定義が変わったときにおかしくなるので、型チェック関数を定義する
   return store.get('stationList', [])
 }

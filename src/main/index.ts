@@ -100,7 +100,7 @@ ipcMain.handle('downloadAudio', async (event, program: ProgramForCard) => {
 
   // キャンセルされたのでダウンロードしない
   if (filePath === undefined) {
-    return
+    return false
   }
 
   return await downloadAudio(program.stationId, program.ft, program.to, filePath)

@@ -11,10 +11,10 @@ import {
   ProgressBar,
   Field
 } from '@fluentui/react-components'
-import { ArrowDownload24Regular, CompassNorthwestFilled } from '@fluentui/react-icons'
-import { ProgramForCard } from 'src/shared/types'
+import { ArrowDownload24Regular } from '@fluentui/react-icons'
+import { DownloadResult, ProgramForCard } from 'src/shared/types'
 import { getDayjs } from '../../../../shared/util'
-import { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { useDownloadAudio } from '@renderer/hooks/useDownloadAudio'
 
 interface Props {
@@ -26,6 +26,17 @@ const useStyles = makeStyles({
     width: '320px',
     // タイトルが2行に改行されても収まる高さ
     height: '326px'
+  }
+})
+
+const useFooterStyles = makeStyles({
+  root: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    columnGap: '0.5rem',
+    justifyContent: 'start',
+    alignItems: 'center'
   }
 })
 
@@ -81,16 +92,20 @@ function ProgramCardDescription(program: ProgramForCard): JSX.Element {
   const endDateTime = getDayjs(program.to, 'YYYYMMDDhhmmss')
   return (
     <Caption1>
-      {program.stationName} - {formatDateRange(startDateTime, endDateTime)}
+      {program.stationName} | {formatDateRange(startDateTime, endDateTime)}
     </Caption1>
   )
 }
 
-export default function ProgramCard(props: Props): JSX.Element {
-  const styles = useStyles()
-  const { downloadAudio, result} = useDownloadAudio(props.program)
+function ProgramCardFooter(props: {
+  result: Partial<DownloadResult>
+  onDownload: () => void
+}): JSX.Element {
+  const { result, onDownload } = props
 
-  const FooterContent = (): JSX.Element => {
+  const classes = useFooterStyles()
+
+  const Content = (): JSX.Element => {
     if (result.progress != null && result.progress < 100) {
       return (
         <Field validationMessage="ダウンロード中" validationState="none" style={{ width: '100%' }}>
@@ -99,24 +114,40 @@ export default function ProgramCard(props: Props): JSX.Element {
       )
     }
 
-    if (result.progress === 100) {
+    if (result.progress === 100 && result.downloadDate != null) {
+      const now = dayjs()
+      const downloadDate = getDayjs(result.downloadDate, 'YYYYMMDDhhmmss')
+      const dateText = downloadDate.isSame(now, 'day')
+        ? downloadDate.format('HH:mm')
+        : downloadDate.format('DD日')
+
       return (
-        <Field
-          validationMessage="ダウンロードしました"
-          validationState="success"
-          style={{ width: '100%' }}
-        >
-          <ProgressBar value={result.progress / 100} />
-        </Field>
+        <>
+          <Button icon={<ArrowDownload24Regular />} onClick={onDownload}>
+            ダウンロード
+          </Button>
+          <Caption1>{dateText}にダウンロード済み</Caption1>
+        </>
       )
     }
 
     return (
-      <Button icon={<ArrowDownload24Regular />} onClick={() => downloadAudio()}>
+      <Button icon={<ArrowDownload24Regular />} onClick={onDownload}>
         ダウンロード
       </Button>
     )
   }
+
+  return (
+    <div className={classes.root}>
+      <Content />
+    </div>
+  )
+}
+
+export default function ProgramCard(props: Props): JSX.Element {
+  const styles = useStyles()
+  const { downloadAudio, result } = useDownloadAudio(props.program)
 
   return (
     <Card className={styles.card}>
@@ -132,7 +163,7 @@ export default function ProgramCard(props: Props): JSX.Element {
       </div>
 
       <CardFooter>
-        <FooterContent />
+        <ProgramCardFooter result={result} onDownload={downloadAudio} />
       </CardFooter>
     </Card>
   )
