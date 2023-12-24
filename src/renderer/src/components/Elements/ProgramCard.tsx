@@ -9,14 +9,15 @@ import {
   makeStyles,
   Image,
   ProgressBar,
-  Field
+  Field,
+  shorthands,
 } from '@fluentui/react-components'
 import { ArrowDownload24Regular } from '@fluentui/react-icons'
 import { DownloadResult, ProgramForCard } from 'src/shared/types'
 import { getDayjs } from '../../../../shared/util'
 import dayjs, { Dayjs } from 'dayjs'
 import { useDownloadAudio } from '@renderer/hooks/useDownloadAudio'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface Props {
   program: ProgramForCard
@@ -27,6 +28,19 @@ const useStyles = makeStyles({
     width: '320px',
     // タイトルが2行に改行されても収まる高さ
     height: '326px'
+  }
+})
+
+const useHeaderTitleStyles = makeStyles({
+  // タイトルが2行に収まらないときに、「...」で省略
+  root: {
+    textOverflow: 'ellipsis',
+    ...shorthands.overflow('hidden'),
+    // タイトル2行分の高さ
+    maxHeight: '40px',
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical',
+    WebkitLineClamp: '2',
   }
 })
 
@@ -42,8 +56,9 @@ const useFooterStyles = makeStyles({
 })
 
 function ProgramCardHeader(program: ProgramForCard): JSX.Element {
+  const classes = useHeaderTitleStyles()
   return (
-    <Body1>
+    <Body1 className={classes.root}>
       <b>{program.title}</b>
     </Body1>
   )
