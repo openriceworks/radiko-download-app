@@ -4,10 +4,9 @@ import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
 import { filterProgramList } from '../../../../shared/util'
 import ProgramScrollView from '../Elements/ProgramScrollView'
 import ProgramSearchForm from '../Form/ProgramSearchForm'
+import { ScreenBaseProps } from '.'
 
-interface Props {
-  screenHeight: string
-
+interface Props extends ScreenBaseProps {
   stationList: StationInfo[]
   stationProgramList: StationWithProgram[]
 }

@@ -110,6 +110,10 @@ ipcMain.handle('downloadAudio', async (event, program: ProgramForCard) => {
   return await downloadAudio(program.stationId, program.ft, program.to, filePath)
 })
 
+ipcMain.handle('getHistoryList', () => {
+  return store.getDownloadResultList()
+})
+
 ipcMain.handle('getProgress', (event, program: ProgramForCard) => {
   return store.getDownloadResult(program.stationId, program.ft)
 })

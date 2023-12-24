@@ -127,7 +127,12 @@ export const isProgramForApi = (data: unknown): data is ProgramForApi => {
 }
 
 export interface DownloadResult {
-  path: string | undefined
+  path: string
   progress: number
   downloadDate: string | null
+}
+
+export interface DownloadHistory extends DownloadResult {
+  stationId: string
+  startAt: string
 }

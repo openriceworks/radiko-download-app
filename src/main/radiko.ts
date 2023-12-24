@@ -229,7 +229,7 @@ export const downloadAudio = async (stationId, startAt, endAt, outputFileName) =
   const playListUrl = await getMasterPlayList(stationId, startAt, endAt)
 
   store.setDownloadResult(stationId, startAt, {
-    path: undefined,
+    path: outputFileName,
     progress: 0,
     downloadDate: null
   })
@@ -251,7 +251,7 @@ export const downloadAudio = async (stationId, startAt, endAt, outputFileName) =
       const time = parseInt(progress.timemark.replace(/:/g, ''))
       const percent = (time / totalTime) * 100
       store.setDownloadResult(stationId, startAt, {
-        path: undefined,
+        path: outputFileName,
         progress: percent,
         downloadDate: null
       })

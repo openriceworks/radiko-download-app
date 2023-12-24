@@ -18,7 +18,7 @@ export const useDownloadAudio = (program: ProgramForCard) => {
     },
     initialData: {},
     refetchInterval: ({ state }) => {
-      if (state.data == null || state.data.path == null) {
+      if (state.data == null || state.data.downloadDate == null) {
         return 100
       }
       return Infinity

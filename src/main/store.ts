@@ -1,5 +1,7 @@
 import Store from 'electron-store'
-import { DownloadResult, StationWithProgram } from '../shared/types'
+import { DownloadResult, DownloadHistory, StationWithProgram } from '../shared/types'
+import dayjs from 'dayjs'
+import { getDayjs } from '../shared/util'
 
 interface StoreType {
   stationProgramList: StationWithProgram[]
@@ -17,6 +19,34 @@ export const getStationProgramList = () => {
 }
 export const setStationProgramList = (stationProgramList: StationWithProgram[]) => {
   store.set('stationProgramList', stationProgramList)
+}
+
+export const getDownloadResultList = (): DownloadHistory[] => {
+  const resultStore = store.get('downloadResult') ?? {}
+
+  // 2週間分取得する
+  const limitDate = dayjs().subtract(14, 'day')
+
+  return Object.entries(resultStore)
+    .filter(([key, value]) => {
+      if (value.downloadDate == null) {
+        return true
+      }
+      return getDayjs(value.downloadDate, 'YYYYMMDDhhmmss').isAfter(limitDate)
+    })
+    .map(([key, value]) => {
+      const [stationId, startAt] = key.split('-')
+      return {
+        stationId,
+        startAt,
+        ...value
+      } satisfies DownloadHistory
+    })
+    .sort((a, b) => {
+      const aDate = a.downloadDate != null ? getDayjs(a.downloadDate, 'YYYYMMDDhhmmss') : dayjs()
+      const bDate = b.downloadDate != null ? getDayjs(b.downloadDate, 'YYYYMMDDhhmmss') : dayjs()
+      return bDate.diff(aDate, 'second')
+    })
 }
 
 export const getDownloadResult = (

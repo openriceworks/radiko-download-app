@@ -22,6 +22,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
+    "@fluentui-contrib/react-data-grid-react-window": "^1.1.2",
     "@fluentui/react-components": "^9.42.0",
     "@fluentui/react-icons": "^2.0.223",
     "@tanstack/react-query": "^5.12.2",
