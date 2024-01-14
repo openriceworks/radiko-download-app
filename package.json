@@ -13,6 +13,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
+    "test": "vitest run",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:win": "npm run build && electron-builder --win --config",
@@ -34,7 +35,8 @@
     "electron-updater": "^6.1.1",
     "fast-xml-parser": "^4.3.2",
     "fluent-ffmpeg": "^2.1.2",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "vitest": "^1.2.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^1.0.1",
