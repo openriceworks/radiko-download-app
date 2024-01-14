@@ -1,16 +1,23 @@
 # radiko-download-app
 
-An Electron application with React and TypeScript
+radikoのタイムフリー番組をダウンロードするelectronアプリ。
 
-## Recommended IDE Setup
+## ディレクトリ構成
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+| パス                            |                                                                |
+| ------------------------------- | -------------------------------------------------------------- |
+| [/src/main](/src/main/)         | Node.jsで実行するコード                                        |
+| [/src/preload](/src/preload/)   | Node.jsとChromiumの仲介コード(今のままにしておく)              |
+| [/src/renderer](/src/renderer/) | Chromiumで実行するコード(React)                                |
+| [/src/shared](/src/shared/)     | `/src/main`と`/src/renderer`の両方で使用する可能性のあるコード |
 
 ## Project Setup
 
 ### Install
 
 ```bash
+$ npm install -g corepack
+$ corepack enable
 $ pnpm install
 ```
 
@@ -19,6 +26,8 @@ $ pnpm install
 ```bash
 $ pnpm dev
 ```
+
+> `/src/main` を変更した時にはホットリロードされないので、終了し、再実行する
 
 ### Build
 
