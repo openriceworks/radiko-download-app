@@ -1,11 +1,18 @@
 import Store from 'electron-store'
-import { DownloadResult, DownloadHistory, StationWithProgram } from '../shared/types'
+import {
+  DownloadResult,
+  DownloadHistory,
+  StationWithProgram,
+  Settings,
+  getDefaultSettings
+} from '../shared/types'
 import dayjs from 'dayjs'
 import { getDayjs } from '../shared/util'
 
 interface StoreType {
   stationProgramList: StationWithProgram[]
   downloadResult: Record<string, DownloadResult>
+  settings: Settings
 }
 
 // NOTE : electron-storeへのアクセスこのファイルのみで行う
@@ -67,4 +74,17 @@ export const setDownloadResult = (
   const key = `${stationId}-${startAt}`
   resultStore[key] = downloadResult
   store.set('downloadResult', resultStore)
+}
+
+export const getSettings = () => {
+  return store.get('settings', getDefaultSettings())
+}
+export const setSettings = (settings: Settings) => {
+  store.set('settings', settings)
+}
+
+export const reset = () => {
+  store.set('settings', getDefaultSettings())
+  store.set('downloadResult', [])
+  store.set('stationProgramList', [])
 }

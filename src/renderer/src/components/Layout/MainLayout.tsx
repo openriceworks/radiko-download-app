@@ -1,18 +1,15 @@
+import { makeStyles, SelectTabData, SelectTabEvent, Tab, TabList } from '@fluentui/react-components'
 import {
-  makeStyles,
-  SelectTabData,
-  SelectTabEvent,
-  Spinner,
-  Tab,
-  TabList
-} from '@fluentui/react-components'
-import { useStationProgramList } from '@renderer/hooks/useStationProgramList'
-import { useStationList } from '@renderer/hooks/useStationList'
-import { CalendarPlayRegular, FluentIcon, HistoryRegular } from '@fluentui/react-icons'
+  CalendarPlayRegular,
+  FluentIcon,
+  HistoryRegular,
+  LauncherSettingsRegular
+} from '@fluentui/react-icons'
 import { useEffect, useRef, useState } from 'react'
 import HomeScreen from '../Screen/HomeScreen'
 import HistoryScreen from '../Screen/HistoryScreen'
 import { useWindowSize } from '@renderer/hooks/useWindosSize'
+import ConfigScreen from '../Screen/ConfigScreen'
 
 const useStyles = makeStyles({
   root: {
@@ -24,16 +21,7 @@ const useStyles = makeStyles({
   }
 })
 
-const useLoadingStyles = makeStyles({
-  root: {
-    height: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-})
-
-type Menu = 'home' | 'history'
+type Menu = 'home' | 'history' | 'config'
 const menuMap: Record<Menu, { label: string; Icon: FluentIcon }> = {
   home: {
     label: '番組',
@@ -42,6 +30,10 @@ const menuMap: Record<Menu, { label: string; Icon: FluentIcon }> = {
   history: {
     label: '履歴',
     Icon: HistoryRegular
+  },
+  config: {
+    label: '設定',
+    Icon: LauncherSettingsRegular
   }
 }
 
@@ -66,11 +58,6 @@ function TabSelect(props: { value: Menu; onTabSelect: (menu: Menu) => void }) {
 export default function MainLayout(): JSX.Element {
   const [menu, setMenu] = useState<Menu>('home')
 
-  const { isFetching: isFetchingStation, stationList } = useStationList()
-  const { isFetching: isFetchingProgram, stationProgramList } = useStationProgramList()
-
-  const isFetching = isFetchingStation || isFetchingProgram
-
   // = 全体の高さ(100vh) - classesの上下のpadding(2rem) - TabListの高さ(56px) - TabList下のmargin(1rem)
   const screenHeight = 'calc(100vh - 2rem - 56px - 1rem)'
 
@@ -84,16 +71,14 @@ export default function MainLayout(): JSX.Element {
     }, [size])
 
     // TODO タブ切り替え前の状態にしたければmemo化する必要がある
-    let currentScreen = (
-      <HomeScreen
-        screenHeight={screenHeight}
-        stationList={stationList}
-        stationProgramList={stationProgramList}
-      />
-    )
+    let currentScreen = <HomeScreen screenHeight={screenHeight} />
 
     if (props.menu === 'history') {
       currentScreen = <HistoryScreen screenHeight={screenHeight} screenHeightPx={heightPx ?? 0} />
+    }
+
+    if (props.menu === 'config') {
+      currentScreen = <ConfigScreen screenHeight={screenHeight} />
     }
 
     return (
@@ -103,21 +88,14 @@ export default function MainLayout(): JSX.Element {
     )
   }
 
-  if (isFetching) {
-    const classes = useLoadingStyles()
-    return (
-      <div className={classes.root}>
-        <Spinner labelPosition="before" label="radikoの番組を取得しています" />
+  const classes = useStyles()
+
+  return (
+    <div className={classes.root}>
+      <div style={{ marginLeft: '-0.75rem', marginBottom: '1rem' }}>
+        <TabSelect value={menu} onTabSelect={setMenu} />
       </div>
-    )
-  } else {
-    return (
-      <div className={useStyles().root}>
-        <div style={{ marginLeft: '-0.75rem', marginBottom: '1rem' }}>
-          <TabSelect value={menu} onTabSelect={setMenu} />
-        </div>
-        <Screen menu={menu} />
-      </div>
-    )
-  }
+      <Screen menu={menu} />
+    </div>
+  )
 }

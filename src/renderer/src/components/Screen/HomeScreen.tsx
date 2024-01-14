@@ -1,14 +1,16 @@
 import { ScrollToInterface } from '@fluentui/react-components/dist/unstable'
 import { useState, useRef, useEffect } from 'react'
-import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
+import { SearchParam } from 'src/shared/types'
 import { filterProgramList } from '../../../../shared/util'
 import ProgramScrollView from '../Elements/ProgramScrollView'
 import ProgramSearchForm from '../Form/ProgramSearchForm'
 import { ScreenBaseProps } from '.'
+import LoadingSpinner from '../Elements/LoadingSpinner'
+import { useStationList } from '@renderer/hooks/useStationList'
+import { useStationProgramList } from '@renderer/hooks/useStationProgramList'
 
 interface Props extends ScreenBaseProps {
-  stationList: StationInfo[]
-  stationProgramList: StationWithProgram[]
+
 }
 
 export default function HomeScreen(props: Props) {
@@ -18,7 +20,12 @@ export default function HomeScreen(props: Props) {
     stationId: ''
   })
 
-  const programList = filterProgramList(props.stationProgramList, searchParam)
+  const { isFetching: isFetchingStation, stationList } = useStationList()
+  const { isFetching: isFetchingProgram, stationProgramList } = useStationProgramList()
+
+  const isFetching = isFetchingStation || isFetchingProgram
+
+  const programList = filterProgramList(stationProgramList, searchParam)
 
   // = screenHeight - ProgramSearchFormの高さ(54px) - ProgramScrollViewのmarginTop(1rem)
   const programScrollViewHeight = `calc(${props.screenHeight} - 54px - 1rem)`
@@ -31,11 +38,15 @@ export default function HomeScreen(props: Props) {
     }
   }, [searchParam])
 
+  if (isFetching) {
+    return <LoadingSpinner label="radikoの番組を取得しています" />
+  }
+
   return (
     <div>
       <ProgramSearchForm
-        stationsList={props.stationList}
-        stationProgramList={props.stationProgramList}
+        stationsList={stationList}
+        stationProgramList={stationProgramList}
         value={searchParam}
         setValue={setSearchParam}
       />
