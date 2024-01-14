@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { downloadAudio, getStationInfoList, getStationProgramList } from './radiko'
-import { ProgramForCard } from '../shared/types'
+import { ProgramForCard, Settings } from '../shared/types'
 import * as store from './store'
 
 // https://qiita.com/jumbOrNot/items/e19055700f59124556c0
@@ -116,4 +116,19 @@ ipcMain.handle('getHistoryList', () => {
 
 ipcMain.handle('getProgress', (event, program: ProgramForCard) => {
   return store.getDownloadResult(program.stationId, program.ft)
+})
+
+ipcMain.handle('getSettings', () => {
+  return store.getSettings()
+})
+
+ipcMain.handle('setSettings', (event, settings: Settings) => {
+  store.setSettings(settings)
+})
+
+ipcMain.handle('resetSettings', () => {
+  store.reset()
+  BrowserWindow.getAllWindows().forEach((window) => {
+    window.close()
+  })
 })

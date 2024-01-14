@@ -2,6 +2,7 @@ import { FluentProvider, webLightTheme, webDarkTheme } from '@fluentui/react-com
 import { makeStyles, tokens } from '@fluentui/react-components'
 import MainLayout from './components/Layout/MainLayout'
 import { useSystemTheme } from './hooks/useSystemTheme'
+import { useSettings } from './hooks/useSettings'
 
 const useStyles = makeStyles({
   root: {
@@ -28,15 +29,16 @@ function App(): JSX.Element {
   const classes = useStyles()
   const rootClasses = useRootStyles()
 
+  const { settings } = useSettings()
   const { systemTheme } = useSystemTheme()
-  const theme = systemTheme === 'dark' ? webDarkTheme : webLightTheme
+  const themeName =
+    settings?.theme != null && settings.theme != 'system' ? settings.theme : systemTheme
+  const theme = themeName === 'dark' ? webDarkTheme : webLightTheme
 
   return (
     <FluentProvider theme={theme}>
       <div className={rootClasses.root}>
-        <div className={classes.root}>
-          <MainLayout />
-        </div>
+        <div className={classes.root}>{settings == null ? <></> : <MainLayout />}</div>
       </div>
     </FluentProvider>
   )
