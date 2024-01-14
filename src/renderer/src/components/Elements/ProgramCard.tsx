@@ -10,7 +10,7 @@ import {
   Image,
   ProgressBar,
   Field,
-  shorthands,
+  shorthands
 } from '@fluentui/react-components'
 import { ArrowDownload24Regular } from '@fluentui/react-icons'
 import { DownloadResult, ProgramForCard } from 'src/shared/types'
@@ -40,7 +40,7 @@ const useHeaderTitleStyles = makeStyles({
     maxHeight: '40px',
     display: '-webkit-box',
     WebkitBoxOrient: 'vertical',
-    WebkitLineClamp: '2',
+    WebkitLineClamp: '2'
   }
 })
 

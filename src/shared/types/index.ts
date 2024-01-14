@@ -1,11 +1,10 @@
-
 export interface Settings {
   theme: ThemeType
 }
 
-export const getDefaultSettings = () : Settings => ({
+export const getDefaultSettings = (): Settings => ({
   theme: 'system'
-}) 
+})
 
 export type ThemeType = 'system' | 'dark' | 'light'
 

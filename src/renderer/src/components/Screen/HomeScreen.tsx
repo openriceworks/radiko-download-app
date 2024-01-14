@@ -9,9 +9,7 @@ import LoadingSpinner from '../Elements/LoadingSpinner'
 import { useStationList } from '@renderer/hooks/useStationList'
 import { useStationProgramList } from '@renderer/hooks/useStationProgramList'
 
-interface Props extends ScreenBaseProps {
-
-}
+interface Props extends ScreenBaseProps {}
 
 export default function HomeScreen(props: Props) {
   const [searchParam, setSearchParam] = useState<SearchParam>({

@@ -43,7 +43,7 @@ export default function HistoryTable(props: Props) {
         }
 
         const progress = Math.floor(history.progress)
-        return <TableCellLayout>`ダウンロード中 ${progress}%`</TableCellLayout>
+        return <TableCellLayout>ダウンロード中 {progress}%</TableCellLayout>
       }
     })
   ]
