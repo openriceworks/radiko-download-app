@@ -4,7 +4,8 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     '@electron-toolkit/eslint-config-ts/recommended',
-    '@electron-toolkit/eslint-config-prettier'
+    '@electron-toolkit/eslint-config-prettier',
+    'plugin:storybook/recommended'
   ],
   rules: {
     '@typescript-eslint/no-unused-vars': 'off',
