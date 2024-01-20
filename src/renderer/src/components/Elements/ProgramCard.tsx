@@ -14,13 +14,13 @@ import {
 } from '@fluentui/react-components'
 import { ArrowDownload24Regular } from '@fluentui/react-icons'
 import { DownloadResult, ProgramForCard } from 'src/shared/types'
-import { getDayjs } from '../../../../shared/util'
-import dayjs, { Dayjs } from 'dayjs'
-import { useDownloadAudio } from '@renderer/hooks/useDownloadAudio'
-import { useEffect, useRef } from 'react'
+import { getDayjs, formatDateRange } from '../../../../shared/util'
+import dayjs from 'dayjs'
 
-interface Props {
+export interface ProgramCardProps {
   program: ProgramForCard
+  downloadResult: Partial<DownloadResult>
+  onDownloadClick: () => void
 }
 
 const useStyles = makeStyles({
@@ -64,45 +64,6 @@ function ProgramCardHeader(program: ProgramForCard): JSX.Element {
   )
 }
 
-function formatDateRange(fromDate: Dayjs, toDate: Dayjs): string {
-  const fromDatePattern = 'YYYY/MM/DD '
-
-  const fromDateVisible = fromDate.clone().subtract(fromDate.get('hour') < 5 ? 1 : 0, 'day')
-  const fromTimeVisible = {
-    hour: fromDate.get('hour') + (fromDate.get('hour') < 5 ? 24 : 0),
-    minutes: fromDate.get('minute')
-  }
-
-  const toDateVisible = toDate.clone().subtract(toDate.get('hour') < 5 ? 1 : 0, 'day')
-  const toTimeVisible = {
-    hour: toDate.get('hour') + (toDate.get('hour') < 5 ? 24 : 0),
-    minutes: toDate.get('minute')
-  }
-
-  let toDatePattern = 'YYYY/MM/DD '
-  if (fromDateVisible.get('year') === toDateVisible.get('year')) {
-    toDatePattern = 'MM/DD '
-    if (fromDateVisible.get('month') === toDateVisible.get('month')) {
-      // 月だけの省略はしない
-      if (fromDateVisible.get('day') == toDateVisible.get('day')) {
-        toDatePattern = ''
-      }
-    }
-  }
-  const fromDateStr = fromDateVisible.format(fromDatePattern)
-  const fromHourStr =
-    fromTimeVisible.hour > 9 ? `${fromTimeVisible.hour}` : `0${fromTimeVisible.hour}`
-  const fromMinuteHour =
-    fromTimeVisible.minutes > 9 ? `${fromTimeVisible.minutes}` : `0${fromTimeVisible.minutes}`
-
-  const toDateStr = toDatePattern !== '' ? toDateVisible.format(toDatePattern) : ''
-  const toHourStr = toTimeVisible.hour > 9 ? `${toTimeVisible.hour}` : `0${toTimeVisible.hour}`
-  const toMinuteHour =
-    toTimeVisible.minutes > 9 ? `${toTimeVisible.minutes}` : `0${toTimeVisible.minutes}`
-
-  return `${fromDateStr}${fromHourStr}:${fromMinuteHour} - ${toDateStr}${toHourStr}:${toMinuteHour}`
-}
-
 function ProgramCardDescription(program: ProgramForCard): JSX.Element {
   const startDateTime = getDayjs(program.ft, 'YYYYMMDDhhmmss')
   const endDateTime = getDayjs(program.to, 'YYYYMMDDhhmmss')
@@ -135,7 +96,7 @@ function ProgramCardFooter(props: {
       const downloadDate = getDayjs(result.downloadDate, 'YYYYMMDDhhmmss')
       const dateText = downloadDate.isSame(now, 'day')
         ? downloadDate.format('HH:mm')
-        : downloadDate.format('DD日')
+        : downloadDate.format('D日')
 
       return (
         <>
@@ -161,46 +122,25 @@ function ProgramCardFooter(props: {
   )
 }
 
-export default function ProgramCard(props: Props): JSX.Element {
+export default function ProgramCard(props: ProgramCardProps): JSX.Element {
   const styles = useStyles()
-  const { downloadAudio, result, getProgress } = useDownloadAudio(props.program)
-
-  const ref = useRef<HTMLDivElement>(null!)
-
-  // 表示領域に入ってからダウンロード済み情報を取得する
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry && entry.isIntersecting) {
-        getProgress()
-        observer.unobserve(entry.target)
-      }
-    })
-
-    if (ref.current) {
-      observer.observe(ref.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
 
   return (
-    <div ref={ref}>
-      <Card className={styles.card}>
-        {/* 16:10のアスペクト比の画像に合わせている */}
-        <CardPreview style={{ width: '320px', height: '200px' }}>
-          <Image src={props.program.imgPath ?? undefined} loading="lazy" />
-        </CardPreview>
-        <div style={{ height: '56px' }}>
-          <CardHeader
-            header={ProgramCardHeader(props.program)}
-            description={ProgramCardDescription(props.program)}
-          />
-        </div>
+    <Card className={styles.card}>
+      {/* 16:10のアスペクト比の画像に合わせている */}
+      <CardPreview style={{ width: '320px', height: '200px' }}>
+        <Image src={props.program.imgPath ?? undefined} loading="lazy" />
+      </CardPreview>
+      <div style={{ height: '56px' }}>
+        <CardHeader
+          header={ProgramCardHeader(props.program)}
+          description={ProgramCardDescription(props.program)}
+        />
+      </div>
 
-        <CardFooter>
-          <ProgramCardFooter result={result} onDownload={downloadAudio} />
-        </CardFooter>
-      </Card>
-    </div>
+      <CardFooter>
+        <ProgramCardFooter result={props.downloadResult} onDownload={props.onDownloadClick} />
+      </CardFooter>
+    </Card>
   )
 }

@@ -1,8 +1,9 @@
 import { ScrollToInterface, VirtualizerScrollView } from '@fluentui/react-components/unstable'
 import { Body2, Title3, makeStyles } from '@fluentui/react-components'
 import { ProgramForCard } from 'src/shared/types'
-import ProgramCard from './ProgramCard'
-import { RefObject } from 'react'
+import ProgramCard, { ProgramCardProps } from './ProgramCard'
+import { RefObject, useEffect, useRef } from 'react'
+import { useDownloadAudio } from '@renderer/hooks/useDownloadAudio'
 
 interface Props {
   programList: ProgramForCard[]
@@ -31,6 +32,38 @@ const useEmptyStyles = makeStyles({
     alignItems: 'center'
   }
 })
+
+export function ProgramCardWrapper(props: Pick<ProgramCardProps, 'program'>): JSX.Element {
+  const { downloadAudio, result, getProgress } = useDownloadAudio(props.program)
+
+  const ref = useRef<HTMLDivElement>(null!)
+
+  // 表示領域に入ってからダウンロード済み情報を取得する
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry && entry.isIntersecting) {
+        getProgress()
+        observer.unobserve(entry.target)
+      }
+    })
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div ref={ref}>
+      <ProgramCard
+        program={props.program}
+        downloadResult={result}
+        onDownloadClick={downloadAudio}
+      />
+    </div>
+  )
+}
 
 export default function ProgramScrollView(props: Props): JSX.Element {
   if (props.programList.length === 0) {
@@ -77,7 +110,7 @@ export default function ProgramScrollView(props: Props): JSX.Element {
             className={classes.child}
           >
             {programListList[index].map((program) => (
-              <ProgramCard key={program.programId} program={program} />
+              <ProgramCardWrapper key={program.programId} program={program} />
             ))}
           </div>
         )

@@ -6,9 +6,7 @@ import { DecoratorsHelper } from '../../util/storybook'
 const meta = {
   title: 'Elements/LabeledSelect',
   component: LabeledSelect,
-  decorators: [
-    DecoratorsHelper
-  ],
+  decorators: [DecoratorsHelper],
   parameters: {},
   tags: []
 } satisfies Meta<typeof LabeledSelect>
