@@ -71,7 +71,6 @@
     "typescript": "^5.1.6",
     "vite": "^4.4.9"
   },
-  "packageManager": "pnpm@8.14.1",
   "build": {
     "mac": {
       "extendInfo": {
