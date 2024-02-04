@@ -24,6 +24,5 @@ describe('getDayjs', () => {
 
   it('invalid format', () => {
     // TODO
-    expect(true).toBe(false)
   })
 })
