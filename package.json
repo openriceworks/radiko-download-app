@@ -1,6 +1,6 @@
 {
   "name": "radiko-download-app",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "example.com",
@@ -21,7 +21,9 @@
     "build:mac": "electron-vite build && electron-builder --mac --config",
     "build:linux": "electron-vite build && electron-builder --linux --config",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prerelease": "electron-vite build",
+    "release": "electron-builder"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",
@@ -69,5 +71,22 @@
     "typescript": "^5.1.6",
     "vite": "^4.4.9"
   },
-  "packageManager": "pnpm@8.14.1"
+  "packageManager": "pnpm@8.14.1",
+  "build": {
+    "mac": {
+      "extendInfo": {
+        "LSUIElement": true
+      },
+      "identity": null
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "openriceworks",
+      "repo": "radiko-download-app",
+      "releaseType": "release"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  }
 }
