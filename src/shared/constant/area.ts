@@ -48,4 +48,4 @@ export const AreaDictionaly = {
   JP47: '沖縄'
 } as const
 
-type AreaDictionaly = keyof typeof AreaDictionaly
+export type AreaDictionaly = keyof typeof AreaDictionaly
