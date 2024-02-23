@@ -1,9 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, ipcMain, dialog, BrowserWindow, BrowserView, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { downloadAudio, getStationInfoList, getStationProgramList } from './radiko'
-import { ProgramForCard, Settings } from '../shared/types'
+import { ProgramForCard, Settings, isCookies } from '../shared/types'
 import * as store from './store'
 
 // https://qiita.com/jumbOrNot/items/e19055700f59124556c0
@@ -61,6 +61,23 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+
+  session.defaultSession.cookies.addListener('changed', async (event) => {
+    const cookies = await session.defaultSession.cookies.get({ url: 'https://radiko.jp/' })
+
+    BrowserWindow.getAllWindows().forEach((window) => {
+      if (window.getBrowserView()?.webContents.getURL() == 'https://radiko.jp/') {
+        const cookiesObj = Object.fromEntries(cookies.map((cookie) => [cookie.name, cookie.value]))
+        if (isCookies(cookiesObj)) {
+          store.setCookies(cookiesObj)
+        } else {
+          console.error('Invalid cookies', cookiesObj)
+        }
+        window.close()
+      }
+      console.log(window.getBrowserView()?.webContents.getURL())
+    })
   })
 })
 
@@ -131,4 +148,13 @@ ipcMain.handle('resetSettings', () => {
   BrowserWindow.getAllWindows().forEach((window) => {
     window.close()
   })
+})
+
+ipcMain.handle('openLoginPage', () => {
+  const win = new BrowserWindow({ width: 800, height: 600 })
+
+  const view = new BrowserView()
+  win.setBrowserView(view)
+  view.setBounds({ height: 600, width: 800, x: 0, y: 0 })
+  view.webContents.loadURL('https://radiko.jp/member/login')
 })

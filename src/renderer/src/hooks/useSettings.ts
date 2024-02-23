@@ -36,10 +36,15 @@ export const useSettings = () => {
     await window.electron.ipcRenderer.invoke('resetSettings')
   }
 
+  const openLoginPage = async () => {
+    await window.electron.ipcRenderer.invoke('openLoginPage')
+  }
+
   return {
     settings,
     isPending,
     update,
-    reset
+    reset,
+    openLoginPage
   }
 }

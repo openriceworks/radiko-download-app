@@ -6,11 +6,64 @@ export const getDefaultSettings = (): Settings => ({
   theme: 'system'
 })
 
+export interface Cookies {
+  // areafree_id: string
+  a_exp: string
+  // default_area_id: string
+  'radiko-policy-accept': string
+  radiko_session: string
+  // rdk_uid: string
+  // tracking_area_id: string
+  // user_region: string
+  _ga: string
+  // _ga0_e17_khfd9e: string
+  _gid: string
+  _td: string
+  _td_ssc_id: string
+  '_dc_gtm_UA-21104474-1': string
+}
+
+export const isCookies = (data: unknown): data is Cookies => {
+  if (data == null || typeof data !== 'object') {
+    return false
+  }
+
+  if (typeof data['a_exp'] !== 'string') {
+    return false
+  }
+
+  if (typeof data['radiko-policy-accept'] !== 'string') {
+    return false
+  }
+  if (typeof data['radiko_session'] !== 'string') {
+    return false
+  }
+
+  if (typeof data['_ga'] !== 'string') {
+    return false
+  }
+  if (typeof data['_gid'] !== 'string') {
+    return false
+  }
+  if (typeof data['_td'] !== 'string') {
+    return false
+  }
+  if (typeof data['_td_ssc_id'] !== 'string') {
+    return false
+  }
+  if (typeof data['_dc_gtm_UA-21104474-1'] !== 'string') {
+    return false
+  }
+
+  return true
+}
+
 export type ThemeType = 'system' | 'dark' | 'light'
 
 export interface SearchParam {
   keyword: string
   date: string
+  areaId: string
   stationId: string
 }
 

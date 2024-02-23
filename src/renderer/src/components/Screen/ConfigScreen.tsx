@@ -5,7 +5,8 @@ import {
   makeStyles,
   Caption1,
   Body2,
-  Body1
+  Body1,
+  Button
 } from '@fluentui/react-components'
 import { ScreenBaseProps } from '.'
 import { useSettings } from '@renderer/hooks/useSettings'
@@ -83,6 +84,17 @@ function ThemeSection(props: { value: ThemeType; onChange: (value: ThemeType) =>
   )
 }
 
+function PremiumLoginSection(props: { onLogin: () => void }) {
+  return (
+    <SectionBase title="ラジコプレミアム連携">
+      <Body2>
+        ラジコプレミアムのアカウントと連携すると、エリアフリーなどの機能を使うことができます。
+      </Body2>
+      <Button onClick={() => props.onLogin()}>ログイン</Button>
+    </SectionBase>
+  )
+}
+
 function ResetSection(props: { onReset: () => void }) {
   const [open, setOpen] = useState(false)
 
@@ -116,7 +128,7 @@ function ResetSection(props: { onReset: () => void }) {
 export default function ConfigScreen(props: Props) {
   const classes = useStyles()
 
-  const { settings, update, reset } = useSettings()
+  const { settings, update, reset, openLoginPage } = useSettings()
 
   const onChangeTheme = (value) =>
     update({
@@ -128,6 +140,10 @@ export default function ConfigScreen(props: Props) {
     reset()
   }
 
+  const onLogin = () => {
+    openLoginPage()
+  }
+
   // 読み込み終わるまでは表示しない
   if (settings == null) {
     return <div></div>
@@ -136,6 +152,7 @@ export default function ConfigScreen(props: Props) {
   return (
     <div className={classes.root} style={{ height: props.screenHeight }}>
       <ThemeSection value={settings.theme} onChange={onChangeTheme} />
+      <PremiumLoginSection onLogin={onLogin} />
       <ResetSection onReset={onReset} />
     </div>
   )

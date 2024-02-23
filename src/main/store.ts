@@ -4,6 +4,7 @@ import {
   DownloadHistory,
   StationWithProgram,
   Settings,
+  Cookies,
   getDefaultSettings
 } from '../shared/types'
 import dayjs from 'dayjs'
@@ -13,6 +14,7 @@ interface StoreType {
   stationProgramList: StationWithProgram[]
   downloadResult: Record<string, DownloadResult>
   settings: Settings
+  cookies: Cookies | null
 }
 
 // NOTE : electron-storeへのアクセスこのファイルのみで行う
@@ -87,4 +89,12 @@ export const reset = () => {
   store.set('settings', getDefaultSettings())
   store.set('downloadResult', [])
   store.set('stationProgramList', [])
+}
+
+export const setCookies = (cookies: Cookies) => {
+  store.set('cookies', cookies)
+}
+
+export const getCookies = () => {
+  return store.get('cookies', null)
 }
