@@ -4,6 +4,7 @@ import LabeledSelect from '../Elements/LabeledSelect'
 import LabeledInput from '../Elements/LabledInput'
 import { makeStyles, shorthands } from '@fluentui/react-components'
 import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
+import { AreaDictionaly } from '../../../../shared/util/area'
 
 interface Props {
   stationsList: StationInfo[]
@@ -24,6 +25,12 @@ const ProgramSearchForm = (props: Props) => {
   const stationOptionList = props.stationsList.map((station) => (
     <option key={station.stationId} value={station.stationId}>
       {station.stationName}
+    </option>
+  ))
+
+  const areaOptionList = Object.entries(AreaDictionaly).map(([areaCode, areaName]) => (
+    <option key={areaCode} value={areaCode}>
+      {areaName}
     </option>
   ))
 
@@ -59,6 +66,15 @@ const ProgramSearchForm = (props: Props) => {
       >
         <option value="">すべて</option>
         {dateOptionList}
+      </LabeledSelect>
+      <LabeledSelect
+        label="都道府県"
+        value={props.value.areaId}
+        onChange={(e) => setValue('areaId', e.target.value)}
+        defaultValue=""
+      >
+        <option value="">すべて</option>
+        {areaOptionList}
       </LabeledSelect>
       <LabeledSelect
         label="放送局"
