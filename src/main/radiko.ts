@@ -24,6 +24,7 @@ export const authenticate = async () => {
   const headers = {
     'User-Agent': 'curl/7.52.1',
     Accept: '*/*',
+    Cookie: JSON.stringify(store.getCookies()),
     'x-radiko-user': 'user',
     'x-radiko-app': 'pc_html5',
     'x-radiko-app-version': '0.0.1',

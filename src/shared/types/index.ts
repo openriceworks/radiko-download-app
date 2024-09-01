@@ -31,8 +31,8 @@ export const isCookies = (data: unknown): data is Cookies => {
   if (typeof data['a_exp'] !== 'string') {
     return false
   }
-
-  if (typeof data['radiko-policy-accept'] !== 'string') {
+  //取得したCookieに含まれない場合があるためnullチェックを追加
+  if (data['radiko-policy-accept'] != null && typeof data['radiko-policy-accept'] !== 'string') {
     return false
   }
   if (typeof data['radiko_session'] !== 'string') {
@@ -51,7 +51,8 @@ export const isCookies = (data: unknown): data is Cookies => {
   if (typeof data['_td_ssc_id'] !== 'string') {
     return false
   }
-  if (typeof data['_dc_gtm_UA-21104474-1'] !== 'string') {
+  //取得したCookieに含まれない場合があるためnullチェックを追加
+  if (data['_dc_gtm_UA-21104474-1'] != null && typeof data['_dc_gtm_UA-21104474-1'] !== 'string') {
     return false
   }
 

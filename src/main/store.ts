@@ -89,6 +89,7 @@ export const reset = () => {
   store.set('settings', getDefaultSettings())
   store.set('downloadResult', [])
   store.set('stationProgramList', [])
+  store.set('cookies', null)
 }
 
 export const setCookies = (cookies: Cookies) => {
