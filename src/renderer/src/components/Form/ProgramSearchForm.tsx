@@ -4,7 +4,7 @@ import LabeledSelect from '../Elements/LabeledSelect'
 import LabeledInput from '../Elements/LabledInput'
 import { makeStyles, shorthands } from '@fluentui/react-components'
 import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
-import { AreaDictionaly } from '../../../../shared/util/area'
+import { AreaDictionaly } from '../../../../shared/constant/area'
 
 interface Props {
   stationsList: StationInfo[]
