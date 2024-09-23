@@ -103,9 +103,11 @@ export const getStationProgramList = async (
   const minDate = dayjs().add(-7, 'day').startOf('day')
   const maxDate = dayjs().startOf('day')
 
-  const stationProgramList = store.getStationProgramList(selectedAreaId || areaId)
+  const stationProgramList: StationWithProgram[] = store.getStationProgramList(
+    selectedAreaId || areaId
+  )
   // ダウンロードできなくなった日付の番組表を消す
-  stationProgramList.forEach((station) => {
+  stationProgramList.forEach((station: StationWithProgram) => {
     const keyValueList = Object.entries(station.programMap)
     // minDateよりも前の日付を除く
     const filtered = keyValueList.filter(([key, _]) => {
