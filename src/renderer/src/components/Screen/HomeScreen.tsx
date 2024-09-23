@@ -15,11 +15,14 @@ export default function HomeScreen(props: Props) {
   const [searchParam, setSearchParam] = useState<SearchParam>({
     keyword: '',
     date: '',
+    areaId: '',
     stationId: ''
   })
 
-  const { isFetching: isFetchingStation, stationList } = useStationList()
-  const { isFetching: isFetchingProgram, stationProgramList } = useStationProgramList()
+  const { isFetching: isFetchingStation, stationList } = useStationList(searchParam.areaId)
+  const { isFetching: isFetchingProgram, stationProgramList } = useStationProgramList(
+    searchParam.areaId
+  )
 
   const isFetching = isFetchingStation || isFetchingProgram
 

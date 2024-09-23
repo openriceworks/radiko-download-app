@@ -72,9 +72,9 @@ export const authenticate = async () => {
   }
 }
 
-export const getStationInfoList = async (): Promise<StationInfo[]> => {
+export const getStationInfoList = async (selectedAreaId: string): Promise<StationInfo[]> => {
   const { headers, areaId } = await authenticate()
-  const url = `https://radiko.jp/v3/station/list/${areaId}.xml`
+  const url = `https://radiko.jp/v3/station/list/${selectedAreaId || areaId}.xml`
 
   const stationList = await fetch(url, {
     method: 'GET',
@@ -94,15 +94,16 @@ export const getStationInfoList = async (): Promise<StationInfo[]> => {
   })
 }
 
-export const getStationProgramList = async (): Promise<StationWithProgram[]> => {
+export const getStationProgramList = async (
+  selectedAreaId: string
+): Promise<StationWithProgram[]> => {
   const { headers, areaId } = await authenticate()
 
   // radikoのタイムフリーがダウンロードできる範囲
   const minDate = dayjs().add(-7, 'day').startOf('day')
   const maxDate = dayjs().startOf('day')
 
-  const stationProgramList = store.getStationProgramList()
-
+  const stationProgramList = store.getStationProgramList(selectedAreaId || areaId)
   // ダウンロードできなくなった日付の番組表を消す
   stationProgramList.forEach((station) => {
     const keyValueList = Object.entries(station.programMap)
@@ -127,7 +128,7 @@ export const getStationProgramList = async (): Promise<StationWithProgram[]> => 
   )
   // 並列ダウンロード
   const programListList = await Promise.all(
-    dateList.map((date) => getProgramList(headers, areaId, date))
+    dateList.map((date) => getProgramList(headers, selectedAreaId || areaId, date))
   )
 
   // APIの仕様上、日付ごとに全ての放送局の番組リストが取得できる。
@@ -141,6 +142,7 @@ export const getStationProgramList = async (): Promise<StationWithProgram[]> => 
         stationProgramList.push({
           stationId: item['@_id'],
           stationName: item['name'],
+          areaId: selectedAreaId || areaId,
           programMap: {}
         })
         station = stationProgramList.find((r) => r.stationId === item['@_id'])

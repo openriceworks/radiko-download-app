@@ -20,14 +20,14 @@ interface StoreType {
 // NOTE : electron-storeへのアクセスこのファイルのみで行う
 const store = new Store<StoreType>({ name: 'data' })
 
-export const getStationProgramList = () => {
+export const getStationProgramList = (areaId: string) => {
   // TODO areaIdが変わったときに全て取り直す機能が必要
 
   // TODO これだと、保存データの定義が変わったときにおかしくなるので、型チェック関数を定義する
-  return store.get('stationProgramList', [])
+  return store.get('stationProgramList_' + areaId, [])
 }
 export const setStationProgramList = (stationProgramList: StationWithProgram[]) => {
-  store.set('stationProgramList', stationProgramList)
+  store.set('stationProgramList_' + stationProgramList[0].areaId, stationProgramList)
 }
 
 export const getDownloadResultList = (): DownloadHistory[] => {

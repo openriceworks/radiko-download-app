@@ -79,7 +79,7 @@ export interface StationInfo {
 export interface StationWithProgram {
   stationId: string
   stationName: string
-
+  areaId: string
   programMap: Record<string, Program[]>
 }
 

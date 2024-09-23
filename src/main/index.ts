@@ -92,12 +92,12 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
-ipcMain.handle('getStationList', async () => {
-  return await getStationInfoList()
+ipcMain.handle('getStationList', async (event, areaId: string) => {
+  return await getStationInfoList(areaId)
 })
 
-ipcMain.handle('getStationProgramList', async () => {
-  return await getStationProgramList()
+ipcMain.handle('getStationProgramList', async (event, areaId: string) => {
+  return await getStationProgramList(areaId)
 })
 
 ipcMain.handle('downloadAudio', async (event, program: ProgramForCard) => {

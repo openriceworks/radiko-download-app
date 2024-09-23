@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { StationWithProgram } from 'src/shared/types'
 
-export const useStationProgramList = () => {
+export const useStationProgramList = (areaId: string) => {
   const { isFetching, data: stationProgramList } = useQuery({
-    queryKey: ['stationProgramList'],
+    queryKey: ['stationProgramList', areaId],
     queryFn: async (): Promise<StationWithProgram[]> =>
-      window.electron.ipcRenderer.invoke('getStationProgramList'),
+      window.electron.ipcRenderer.invoke('getStationProgramList', areaId),
     initialData: [],
     refetchInterval: Infinity
   })

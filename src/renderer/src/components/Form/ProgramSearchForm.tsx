@@ -68,7 +68,7 @@ const ProgramSearchForm = (props: Props) => {
         {dateOptionList}
       </LabeledSelect>
       <LabeledSelect
-        label="都道府県"
+        label="地域"
         value={props.value.areaId}
         onChange={(e) => setValue('areaId', e.target.value)}
         defaultValue=""
