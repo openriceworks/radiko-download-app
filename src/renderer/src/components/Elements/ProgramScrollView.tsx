@@ -12,15 +12,14 @@ interface Props {
 
 const useStyles = makeStyles({
   scrollViewContainer: {
-    width: 'fit-content',
-    rowGap: tokens.spacingVerticalS
+    rowGap: tokens.spacingVerticalXL
   },
   child: {
-    height: '400px',
+    height: 'fit-content',
     width: 'fit-content',
     display: 'flex',
     flexDirection: 'row',
-    columnGap: tokens.spacingVerticalS,
+    columnGap: tokens.spacingHorizontalXL,
     // 左端のカードのborderが切れるので1pxずらす
     marginLeft: '1px',
     marginRight: '1px'

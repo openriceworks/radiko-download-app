@@ -16,7 +16,7 @@ interface Props {
 const useStyles = makeStyles({
   root: {
     display: 'flex',
-    columnGap: tokens.spacingHorizontalXS,
+    columnGap: tokens.spacingHorizontalM,
     textAlign: 'start'
   }
 })

@@ -16,7 +16,7 @@ const useStyles = makeStyles({
   root: {
     display: 'grid',
     gridTemplateRows: 'auto 1fr',
-    rowGap: tokens.spacingVerticalL
+    rowGap: tokens.spacingVerticalXL
   }
 })
 

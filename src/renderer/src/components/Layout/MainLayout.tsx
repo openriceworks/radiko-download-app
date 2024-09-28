@@ -30,7 +30,7 @@ const useStyles = makeStyles({
     display: 'grid',
     gridTemplateRows: 'auto minmax(0,1fr)',
     gridAutoColumns: 'minmax(0,1fr)',
-    rowGap: tokens.spacingVerticalL
+    rowGap: tokens.spacingVerticalXXL
   },
   tabSelect: {
     // ネガティブマージンで<TabSelect>の見た目上の開始位置をウィンドウ上部に設定

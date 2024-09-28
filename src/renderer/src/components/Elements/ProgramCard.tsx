@@ -126,7 +126,7 @@ export default function ProgramCard(props: ProgramCardProps): JSX.Element {
   const styles = useStyles()
 
   return (
-    <Card className={styles.card}>
+    <Card size="large" className={styles.card}>
       {/* 16:10のアスペクト比の画像に合わせている */}
       <CardPreview style={{ width: '320px', height: '200px' }}>
         <Image src={props.program.imgPath ?? undefined} loading="lazy" />

@@ -26,12 +26,17 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'start',
-    rowGap: tokens.spacingVerticalS
+    rowGap: tokens.spacingVerticalXL
   }
 })
 
 const useSectionStyles = makeStyles({
   root: {
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: tokens.spacingHorizontalM
+  },
+  content: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'start',
@@ -43,10 +48,10 @@ function SectionBase(props: { title: string; children: ReactNode }) {
   const sectionClasses = useSectionStyles()
 
   return (
-    <>
+    <div className={sectionClasses.root}>
       <Title3> {props.title} </Title3>
-      <div className={sectionClasses.root}>{props.children}</div>
-    </>
+      <div className={sectionClasses.content}>{props.children}</div>
+    </div>
   )
 }
 
