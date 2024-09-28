@@ -6,20 +6,8 @@ import { useSettings } from './hooks/useSettings'
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: '1080px',
+    width: '100lvw',
     height: '100lvh',
-    marginTop: '0',
-    marginBottom: '0',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    textAlign: 'center'
-  }
-})
-
-const useRootStyles = makeStyles({
-  root: {
-    width: '100%',
-    height: '100%',
     color: tokens.colorNeutralForeground2,
     backgroundColor: tokens.colorNeutralBackground2
   }
@@ -27,7 +15,6 @@ const useRootStyles = makeStyles({
 
 function App(): JSX.Element {
   const classes = useStyles()
-  const rootClasses = useRootStyles()
 
   const { settings } = useSettings()
   const { systemTheme } = useSystemTheme()
@@ -37,9 +24,7 @@ function App(): JSX.Element {
 
   return (
     <FluentProvider theme={theme}>
-      <div className={rootClasses.root}>
-        <div className={classes.root}>{settings == null ? <></> : <MainLayout />}</div>
-      </div>
+      <div className={classes.root}>{settings == null ? <></> : <MainLayout />}</div>
     </FluentProvider>
   )
 }

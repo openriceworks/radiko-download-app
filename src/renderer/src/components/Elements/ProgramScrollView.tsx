@@ -1,5 +1,5 @@
 import { ScrollToInterface, VirtualizerScrollView } from '@fluentui/react-components/unstable'
-import { Body2, Title3, makeStyles } from '@fluentui/react-components'
+import { Body2, Title3, makeStyles, tokens } from '@fluentui/react-components'
 import { ProgramForCard } from 'src/shared/types'
 import ProgramCard, { ProgramCardProps } from './ProgramCard'
 import { RefObject, useEffect, useRef } from 'react'
@@ -7,17 +7,20 @@ import { useDownloadAudio } from '@renderer/hooks/useDownloadAudio'
 
 interface Props {
   programList: ProgramForCard[]
-  height: string
   scrollRef?: RefObject<ScrollToInterface>
 }
 
 const useStyles = makeStyles({
+  scrollViewContainer: {
+    width: 'fit-content',
+    rowGap: tokens.spacingVerticalS
+  },
   child: {
     height: '400px',
     width: 'fit-content',
     display: 'flex',
     flexDirection: 'row',
-    columnGap: '0.5rem',
+    columnGap: tokens.spacingVerticalS,
     // 左端のカードのborderが切れるので1pxずらす
     marginLeft: '1px',
     marginRight: '1px'
@@ -69,7 +72,7 @@ export default function ProgramScrollView(props: Props): JSX.Element {
   if (props.programList.length === 0) {
     const classes = useEmptyStyles()
     return (
-      <div className={classes.root} style={{ height: props.height }}>
+      <div className={classes.root}>
         <Title3>番組が見つかりませんでした。</Title3>
         <Body2>条件を変えて探してみてください。</Body2>
       </div>
@@ -97,7 +100,7 @@ export default function ProgramScrollView(props: Props): JSX.Element {
       itemSize={400}
       container={{
         role: 'list',
-        style: { width: 'fit-content', height: props.height, gap: '0.5rem' }
+        className: classes.scrollViewContainer
       }}
     >
       {(index: number) => {

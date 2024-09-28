@@ -2,7 +2,7 @@ import { Search24Regular } from '@fluentui/react-icons'
 import dayjs from 'dayjs'
 import LabeledSelect from '../Elements/LabeledSelect'
 import LabeledInput from '../Elements/LabledInput'
-import { makeStyles, shorthands } from '@fluentui/react-components'
+import { makeStyles, tokens } from '@fluentui/react-components'
 import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
 import { AreaDictionaly } from '../../../../shared/constant/area'
 
@@ -16,7 +16,7 @@ interface Props {
 const useStyles = makeStyles({
   root: {
     display: 'flex',
-    ...shorthands.gap('4px'),
+    columnGap: tokens.spacingHorizontalXS,
     textAlign: 'start'
   }
 })

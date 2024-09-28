@@ -6,7 +6,8 @@ import {
   Caption1,
   Body2,
   Body1,
-  Button
+  Button,
+  tokens
 } from '@fluentui/react-components'
 import { ScreenBaseProps } from '.'
 import { useSettings } from '@renderer/hooks/useSettings'
@@ -20,10 +21,12 @@ interface Props extends ScreenBaseProps {}
 
 const useStyles = makeStyles({
   root: {
+    maxHeight: '100%',
+    overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'start',
-    rowGap: '0.5rem'
+    rowGap: tokens.spacingVerticalS
   }
 })
 
@@ -32,7 +35,7 @@ const useSectionStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'start',
-    columnGap: '0.25rem'
+    columnGap: tokens.spacingHorizontalXS
   }
 })
 
@@ -150,7 +153,7 @@ export default function ConfigScreen(props: Props) {
   }
 
   return (
-    <div className={classes.root} style={{ height: props.screenHeight }}>
+    <div className={classes.root}>
       <ThemeSection value={settings.theme} onChange={onChangeTheme} />
       <PremiumLoginSection onLogin={onLogin} />
       <ResetSection onReset={onReset} />

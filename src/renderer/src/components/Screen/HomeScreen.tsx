@@ -8,8 +8,17 @@ import { ScreenBaseProps } from '.'
 import LoadingSpinner from '../Elements/LoadingSpinner'
 import { useStationList } from '@renderer/hooks/useStationList'
 import { useStationProgramList } from '@renderer/hooks/useStationProgramList'
+import { makeStyles, tokens } from '@fluentui/react-components'
 
 interface Props extends ScreenBaseProps {}
+
+const useStyles = makeStyles({
+  root: {
+    display: 'grid',
+    gridTemplateRows: 'auto 1fr',
+    rowGap: tokens.spacingVerticalL
+  }
+})
 
 export default function HomeScreen(props: Props) {
   const [searchParam, setSearchParam] = useState<SearchParam>({
@@ -28,9 +37,6 @@ export default function HomeScreen(props: Props) {
 
   const programList = filterProgramList(stationProgramList, searchParam)
 
-  // = screenHeight - ProgramSearchFormの高さ(54px) - ProgramScrollViewのmarginTop(1rem)
-  const programScrollViewHeight = `calc(${props.screenHeight} - 54px - 1rem)`
-
   // 検索フィルターの条件が変わったら、一番上に戻す
   const scrollRef = useRef<ScrollToInterface>(null)
   useEffect(() => {
@@ -39,24 +45,22 @@ export default function HomeScreen(props: Props) {
     }
   }, [searchParam])
 
+  const classes = useStyles()
+
   if (isFetching) {
     return <LoadingSpinner label="radikoの番組を取得しています" />
   }
 
   return (
-    <div>
+    <div className={classes.root}>
       <ProgramSearchForm
         stationsList={stationList}
         stationProgramList={stationProgramList}
         value={searchParam}
         setValue={setSearchParam}
       />
-      <div style={{ marginTop: '1rem' }}>
-        <ProgramScrollView
-          scrollRef={scrollRef}
-          programList={programList}
-          height={programScrollViewHeight}
-        />
+      <div style={{ height: '100%', overflowY: 'hidden' }}>
+        <ProgramScrollView scrollRef={scrollRef} programList={programList} />
       </div>
     </div>
   )

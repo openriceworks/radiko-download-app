@@ -22,9 +22,14 @@ import ConfigScreen from '../Screen/ConfigScreen'
 const useStyles = makeStyles({
   root: {
     height: '100%',
-    ...shorthands.padding(tokens.spacingVerticalL, tokens.spacingHorizontalL),
+    boxSizing: 'border-box',
+    ...shorthands.padding(tokens.spacingVerticalL, tokens.spacingHorizontalL)
+  },
+  gridContainer: {
+    height: '100%',
     display: 'grid',
-    gridTemplateRows: 'auto 1fr',
+    gridTemplateRows: 'auto minmax(0,1fr)',
+    gridAutoColumns: 'minmax(0,1fr)',
     rowGap: tokens.spacingVerticalL
   },
   tabSelect: {
@@ -83,42 +88,29 @@ function TabSelect(props: TabSelectProps) {
 export default function MainLayout(): JSX.Element {
   const [menu, setMenu] = useState<Menu>('home')
 
-  // = 全体の高さ(100vh) - classesの上下のpadding(2rem) - TabListの高さ(56px) - TabList下のmargin(1rem)
-  const screenHeight = 'calc(100vh - 2rem - 56px - 1rem)'
-
   const Screen = (props: { menu: Menu }) => {
-    const { size } = useWindowSize()
-    const ref = useRef<HTMLDivElement>(null!)
-    const [heightPx, setHeightPx] = useState<number>()
-
-    useEffect(() => {
-      setHeightPx(ref.current?.offsetHeight)
-    }, [size])
-
     // TODO タブ切り替え前の状態にしたければmemo化する必要がある
-    let currentScreen = <HomeScreen screenHeight={screenHeight} />
+    let currentScreen = <HomeScreen />
 
     if (props.menu === 'history') {
-      currentScreen = <HistoryScreen screenHeight={screenHeight} screenHeightPx={heightPx ?? 0} />
+      currentScreen = <HistoryScreen />
     }
 
     if (props.menu === 'config') {
-      currentScreen = <ConfigScreen screenHeight={screenHeight} />
+      currentScreen = <ConfigScreen />
     }
 
-    return (
-      <div ref={ref} style={{ height: screenHeight }}>
-        {currentScreen}
-      </div>
-    )
+    return <>{currentScreen}</>
   }
 
   const classes = useStyles()
 
   return (
     <div className={classes.root}>
-      <TabSelect value={menu} onTabSelect={setMenu} className={classes.tabSelect} />
-      <Screen menu={menu} />
+      <div className={classes.gridContainer}>
+        <TabSelect value={menu} onTabSelect={setMenu} className={classes.tabSelect} />
+        <Screen menu={menu} />
+      </div>
     </div>
   )
 }
