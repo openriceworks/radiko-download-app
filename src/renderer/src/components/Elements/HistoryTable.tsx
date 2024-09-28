@@ -1,7 +1,9 @@
 import {
   TableCellLayout,
   TableColumnDefinition,
-  createTableColumn
+  Title3,
+  createTableColumn,
+  makeStyles
 } from '@fluentui/react-components'
 import {
   DataGridBody,
@@ -18,6 +20,23 @@ import { getDayjs } from '../../../../shared/util'
 interface Props {
   list: DownloadHistory[]
   height: number
+}
+
+const useEmptyStyles = makeStyles({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+})
+function Empty(props: { height: number }) {
+  const classes = useEmptyStyles()
+  return (
+    <div style={{ height: props.height }} className={classes.root}>
+      <Title3>ダウンロードされた番組はありません</Title3>
+    </div>
+  )
 }
 
 export default function HistoryTable(props: Props) {
@@ -68,26 +87,27 @@ export default function HistoryTable(props: Props) {
   }
 
   return (
-    <div>
-      <DataGrid
-        onSelectionChange={onSelectionChange}
-        items={props.list}
-        columns={columns}
-        resizableColumns
-        columnSizingOptions={columnSizingOptions}
-      >
-        <DataGridHeader>
-          <DataGridRow>
-            {({ renderHeaderCell }) => (
-              <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
-            )}
-          </DataGridRow>
-        </DataGridHeader>
-        {/* DataGridHeader分の33pxを引く */}
+    <DataGrid
+      onSelectionChange={onSelectionChange}
+      items={props.list}
+      columns={columns}
+      resizableColumns
+      columnSizingOptions={columnSizingOptions}
+    >
+      <DataGridHeader>
+        <DataGridRow>
+          {({ renderHeaderCell }) => <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>}
+        </DataGridRow>
+      </DataGridHeader>
+
+      {/* DataGridHeader分の33pxを引く */}
+      {props.list.length > 1 ? (
         <DataGridBody<DownloadHistory> itemSize={40} height={props.height - 33}>
           {renderRow}
         </DataGridBody>
-      </DataGrid>
-    </div>
+      ) : (
+        <Empty height={props.height - 33} />
+      )}
+    </DataGrid>
   )
 }
