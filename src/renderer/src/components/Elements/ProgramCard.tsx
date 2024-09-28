@@ -48,10 +48,13 @@ const useFooterStyles = makeStyles({
   root: {
     width: '100%',
     display: 'flex',
-    flexDirection: 'row',
-    columnGap: '0.5rem',
+    flexDirection: 'column',
+    rowGap: tokens.spacingHorizontalS,
     justifyContent: 'start',
-    alignItems: 'center'
+    alignItems: 'start'
+  },
+  button: {
+    width: '100%'
   }
 })
 
@@ -100,7 +103,7 @@ function ProgramCardFooter(props: {
 
       return (
         <>
-          <Button icon={<ArrowDownload24Regular />} onClick={onDownload}>
+          <Button className={classes.button} icon={<ArrowDownload24Regular />} onClick={onDownload}>
             ダウンロード
           </Button>
           <Caption1>{dateText}にダウンロード済み</Caption1>
@@ -109,7 +112,7 @@ function ProgramCardFooter(props: {
     }
 
     return (
-      <Button icon={<ArrowDownload24Regular />} onClick={onDownload}>
+      <Button className={classes.button} icon={<ArrowDownload24Regular />} onClick={onDownload}>
         ダウンロード
       </Button>
     )
