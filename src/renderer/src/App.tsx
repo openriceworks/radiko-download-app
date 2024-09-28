@@ -3,6 +3,7 @@ import { makeStyles, tokens } from '@fluentui/react-components'
 import MainLayout from './components/Layout/MainLayout'
 import { useSystemTheme } from './hooks/useSystemTheme'
 import { useSettings } from './hooks/useSettings'
+import { useEffect, useMemo } from 'react'
 
 const useStyles = makeStyles({
   root: {
@@ -29,9 +30,11 @@ function App(): JSX.Element {
 
   const { settings } = useSettings()
   const { systemTheme } = useSystemTheme()
-  const themeName =
-    settings?.theme != null && settings.theme != 'system' ? settings.theme : systemTheme
-  const theme = changeFontFamily(themeName === 'dark' ? webDarkTheme : webLightTheme)
+  const theme = useMemo(() => {
+    const themeName =
+      settings?.theme != null && settings.theme != 'system' ? settings.theme : systemTheme
+    return changeFontFamily(themeName === 'dark' ? webDarkTheme : webLightTheme)
+  }, [settings, systemTheme])
 
   return (
     <FluentProvider theme={theme}>
