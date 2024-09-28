@@ -29,6 +29,7 @@ const useStyles = makeStyles({
 
 const useEmptyStyles = makeStyles({
   root: {
+    height: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -68,17 +69,18 @@ export function ProgramCardWrapper(props: Pick<ProgramCardProps, 'program'>): JS
   )
 }
 
-export default function ProgramScrollView(props: Props): JSX.Element {
-  if (props.programList.length === 0) {
-    const classes = useEmptyStyles()
-    return (
-      <div className={classes.root}>
-        <Title3>番組が見つかりませんでした。</Title3>
-        <Body2>条件を変えて探してみてください。</Body2>
-      </div>
-    )
-  }
+function Empty() {
+  const classes = useEmptyStyles()
 
+  return (
+    <div className={classes.root}>
+      <Title3>番組が見つかりませんでした。</Title3>
+      <Body2>条件を変えて探してみてください。</Body2>
+    </div>
+  )
+}
+
+export default function ProgramScrollView(props: Props): JSX.Element {
   const classes = useStyles()
 
   const { size } = useWindowSize()
@@ -104,6 +106,10 @@ export default function ProgramScrollView(props: Props): JSX.Element {
     })
     return programListList
   }, [props.programList, columnCount])
+
+  if (props.programList.length === 0) {
+    return <Empty />
+  }
 
   // TODO 変更が即時反映されてしまうが、アニメーションはあった方がいいのだろうか。
   return (
