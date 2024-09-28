@@ -13,10 +13,9 @@ import {
   HistoryRegular,
   LauncherSettingsRegular
 } from '@fluentui/react-icons'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import HomeScreen from '../Screen/HomeScreen'
 import HistoryScreen from '../Screen/HistoryScreen'
-import { useWindowSize } from '@renderer/hooks/useWindosSize'
 import ConfigScreen from '../Screen/ConfigScreen'
 
 const useStyles = makeStyles({
