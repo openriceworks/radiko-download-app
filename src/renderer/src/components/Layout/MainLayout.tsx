@@ -1,4 +1,12 @@
-import { makeStyles, SelectTabData, SelectTabEvent, Tab, TabList } from '@fluentui/react-components'
+import {
+  makeStyles,
+  tokens,
+  shorthands,
+  SelectTabData,
+  SelectTabEvent,
+  Tab,
+  TabList
+} from '@fluentui/react-components'
 import {
   CalendarPlayRegular,
   FluentIcon,
@@ -13,11 +21,17 @@ import ConfigScreen from '../Screen/ConfigScreen'
 
 const useStyles = makeStyles({
   root: {
-    height: 'max-content',
-    paddingTop: '1rem',
-    paddingBottom: '1rem',
-    paddingLeft: '1rem',
-    paddingRight: '1rem'
+    height: '100%',
+    ...shorthands.padding(tokens.spacingVerticalL, tokens.spacingHorizontalL),
+    display: 'grid',
+    gridTemplateRows: 'auto 1fr',
+    rowGap: tokens.spacingVerticalL
+  },
+  tabSelect: {
+    // ネガティブマージンで<TabSelect>の見た目上の開始位置をウィンドウ上部に設定
+    marginTop: `calc(-1 * ${tokens.spacingHorizontalL})`,
+    // ネガティブマージンで<TabSelect>の見た目上の開始位置を<Screen>と揃える
+    marginLeft: `calc(-1 * ${tokens.spacingVerticalM})`
   }
 })
 
@@ -37,13 +51,24 @@ const menuMap: Record<Menu, { label: string; Icon: FluentIcon }> = {
   }
 }
 
-function TabSelect(props: { value: Menu; onTabSelect: (menu: Menu) => void }) {
+interface TabSelectProps {
+  value: Menu
+  onTabSelect: (menu: Menu) => void
+  className?: string
+}
+
+function TabSelect(props: TabSelectProps) {
   const onTabSelect = (event: SelectTabEvent, data: SelectTabData) => {
     props.onTabSelect(data.value as Menu)
   }
 
   return (
-    <TabList size="large" selectedValue={props.value} onTabSelect={onTabSelect}>
+    <TabList
+      size="large"
+      selectedValue={props.value}
+      onTabSelect={onTabSelect}
+      className={props.className}
+    >
       {Object.entries(menuMap).map(([key, value]) => {
         return (
           <Tab key={key} id={key} icon={<value.Icon />} value={key}>
@@ -92,9 +117,7 @@ export default function MainLayout(): JSX.Element {
 
   return (
     <div className={classes.root}>
-      <div style={{ marginLeft: '-0.75rem', marginBottom: '1rem' }}>
-        <TabSelect value={menu} onTabSelect={setMenu} />
-      </div>
+      <TabSelect value={menu} onTabSelect={setMenu} className={classes.tabSelect} />
       <Screen menu={menu} />
     </div>
   )
