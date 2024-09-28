@@ -84,24 +84,21 @@ function TabSelect(props: TabSelectProps) {
   )
 }
 
+function Screen(props: { menu: Menu }) {
+  switch (props.menu) {
+    case 'home':
+      return <HomeScreen />
+    case 'history':
+      return <HistoryScreen />
+    case 'config':
+      return <ConfigScreen />
+    default:
+      return <></>
+  }
+}
+
 export default function MainLayout(): JSX.Element {
   const [menu, setMenu] = useState<Menu>('home')
-
-  const Screen = (props: { menu: Menu }) => {
-    // TODO タブ切り替え前の状態にしたければmemo化する必要がある
-    let currentScreen = <HomeScreen />
-
-    if (props.menu === 'history') {
-      currentScreen = <HistoryScreen />
-    }
-
-    if (props.menu === 'config') {
-      currentScreen = <ConfigScreen />
-    }
-
-    return <>{currentScreen}</>
-  }
-
   const classes = useStyles()
 
   return (
