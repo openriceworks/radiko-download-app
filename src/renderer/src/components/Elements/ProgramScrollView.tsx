@@ -2,8 +2,9 @@ import { ScrollToInterface, VirtualizerScrollView } from '@fluentui/react-compon
 import { Body2, Title3, makeStyles, tokens } from '@fluentui/react-components'
 import { ProgramForCard } from 'src/shared/types'
 import ProgramCard, { ProgramCardProps } from './ProgramCard'
-import { RefObject, useEffect, useRef } from 'react'
+import { RefObject, useEffect, useMemo, useRef } from 'react'
 import { useDownloadAudio } from '@renderer/hooks/useDownloadAudio'
+import { useWindowSize } from '@renderer/hooks/useWindosSize'
 
 interface Props {
   programList: ProgramForCard[]
@@ -15,7 +16,7 @@ const useStyles = makeStyles({
     rowGap: tokens.spacingVerticalXL
   },
   child: {
-    height: 'fit-content',
+    height: '100%',
     width: 'fit-content',
     display: 'flex',
     flexDirection: 'row',
@@ -80,23 +81,37 @@ export default function ProgramScrollView(props: Props): JSX.Element {
 
   const classes = useStyles()
 
-  const programListList: ProgramForCard[][] = []
-  // TODO widthによって一行のカード数を変えたい
-  props.programList.forEach((program) => {
-    if (programListList.length === 0 || programListList[programListList.length - 1].length == 3) {
-      programListList.push([])
-    }
+  const { size } = useWindowSize()
+  // 1列に表示するProgramCardの数
+  // TODO 実際にはこのコンポーネントの高さから求めるのが正しい
+  const columnCount = useMemo(() => {
+    // ウィンドウの幅
+    const width = size[0]
+    // ProgramCardの最小幅200pxよりも大きい値で区切る
+    return Math.min(Math.floor(width / 240), 5)
+  }, [size])
 
-    programListList[programListList.length - 1].push(program)
-  })
+  const programListList = useMemo(() => {
+    const programListList: ProgramForCard[][] = []
+    props.programList.forEach((program) => {
+      if (
+        programListList.length === 0 ||
+        programListList[programListList.length - 1].length == columnCount
+      ) {
+        programListList.push([])
+      }
+      programListList[programListList.length - 1].push(program)
+    })
+    return programListList
+  }, [props.programList, columnCount])
 
   // TODO 変更が即時反映されてしまうが、アニメーションはあった方がいいのだろうか。
   return (
     <VirtualizerScrollView
       imperativeRef={props.scrollRef}
       numItems={programListList.length}
-      // height: 400px
-      itemSize={400}
+      // height: 200px
+      itemSize={200}
       container={{
         role: 'list',
         className: classes.scrollViewContainer
@@ -108,11 +123,11 @@ export default function ProgramScrollView(props: Props): JSX.Element {
             role={'listitem'}
             aria-posinset={index}
             aria-setsize={programListList.length}
-            key={programListList[index][0].programId}
+            key={index}
             className={classes.child}
           >
-            {programListList[index].map((program) => (
-              <ProgramCardWrapper key={program.programId} program={program} />
+            {programListList[index].map((program, programIndex) => (
+              <ProgramCardWrapper key={`${index}-${programIndex}`} program={program} />
             ))}
           </div>
         )

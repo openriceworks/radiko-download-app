@@ -10,7 +10,8 @@ import {
   Image,
   ProgressBar,
   Field,
-  shorthands
+  shorthands,
+  tokens
 } from '@fluentui/react-components'
 import { ArrowDownload24Regular } from '@fluentui/react-icons'
 import { DownloadResult, ProgramForCard } from 'src/shared/types'
@@ -24,10 +25,9 @@ export interface ProgramCardProps {
 }
 
 const useStyles = makeStyles({
-  card: {
-    width: '320px',
-    // タイトルが2行に改行されても収まる高さ
-    height: '326px'
+  cardPreview: {
+    // CardPreviewコンポーネントの左右のpaddingを含めた幅
+    width: `calc(100% + ${tokens.spacingHorizontalL} * 2)`
   }
 })
 
@@ -126,10 +126,9 @@ export default function ProgramCard(props: ProgramCardProps): JSX.Element {
   const styles = useStyles()
 
   return (
-    <Card size="large" className={styles.card}>
-      {/* 16:10のアスペクト比の画像に合わせている */}
-      <CardPreview style={{ width: '320px', height: '200px' }}>
-        <Image src={props.program.imgPath ?? undefined} loading="lazy" />
+    <Card size="large">
+      <CardPreview className={styles.cardPreview}>
+        <Image src={props.program.imgPath ?? undefined} loading="lazy" fit="contain" />
       </CardPreview>
       <div style={{ height: '56px' }}>
         <CardHeader
