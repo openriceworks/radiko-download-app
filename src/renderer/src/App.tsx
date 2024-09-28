@@ -1,4 +1,4 @@
-import { FluentProvider, webLightTheme, webDarkTheme } from '@fluentui/react-components'
+import { FluentProvider, webLightTheme, webDarkTheme, Theme } from '@fluentui/react-components'
 import { makeStyles, tokens } from '@fluentui/react-components'
 import MainLayout from './components/Layout/MainLayout'
 import { useSystemTheme } from './hooks/useSystemTheme'
@@ -13,6 +13,17 @@ const useStyles = makeStyles({
   }
 })
 
+const changeFontFamily = (theme: Theme) => {
+  return {
+    ...theme,
+    // Segoe Fontにライセンスの問題があるので除外した設定に変更
+    fontFamilyBase: "-apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif",
+    fontFamilyMonospace: "Consolas, 'Courier New', Courier, monospace",
+    fontFamilyNumeric:
+      "Bahnschrift, -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif"
+  } satisfies Theme
+}
+
 function App(): JSX.Element {
   const classes = useStyles()
 
@@ -20,7 +31,7 @@ function App(): JSX.Element {
   const { systemTheme } = useSystemTheme()
   const themeName =
     settings?.theme != null && settings.theme != 'system' ? settings.theme : systemTheme
-  const theme = themeName === 'dark' ? webDarkTheme : webLightTheme
+  const theme = changeFontFamily(themeName === 'dark' ? webDarkTheme : webLightTheme)
 
   return (
     <FluentProvider theme={theme}>
