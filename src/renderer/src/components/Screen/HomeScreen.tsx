@@ -20,6 +20,29 @@ const useStyles = makeStyles({
   }
 })
 
+const useSummaryStyles = makeStyles({
+  root: {
+    height: '100%',
+    display: 'flex',
+    columnGap: tokens.spacingHorizontalXS,
+    alignItems: 'end',
+    justifyContent: 'end'
+  },
+  programCount: {
+    fontWeight: tokens.fontWeightBold
+  }
+})
+
+function Summary(props: { programCount }) {
+  const classes = useSummaryStyles()
+  return (
+    <div className={classes.root}>
+      番組数:
+      <span className={classes.programCount}>{props.programCount}</span>
+    </div>
+  )
+}
+
 export default function HomeScreen(props: Props) {
   const [searchParam, setSearchParam] = useState<SearchParam>({
     keyword: '',
@@ -58,6 +81,7 @@ export default function HomeScreen(props: Props) {
         stationProgramList={stationProgramList}
         value={searchParam}
         setValue={setSearchParam}
+        suffixContainer={<Summary programCount={programList.length} />}
       />
       <div style={{ height: '100%', overflowY: 'hidden' }}>
         <ProgramScrollView scrollRef={scrollRef} programList={programList} />

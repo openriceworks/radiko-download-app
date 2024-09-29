@@ -5,12 +5,15 @@ import LabeledInput from '../Elements/LabledInput'
 import { makeStyles, tokens } from '@fluentui/react-components'
 import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
 import { AreaDictionaly } from '../../../../shared/constant/area'
+import { ReactNode } from 'react'
 
 interface Props {
   stationsList: StationInfo[]
   stationProgramList: StationWithProgram[]
   value: SearchParam
   setValue: (SearchParam) => void
+
+  suffixContainer?: ReactNode
 }
 
 const useStyles = makeStyles({
@@ -85,6 +88,7 @@ const ProgramSearchForm = (props: Props) => {
         <option value="">すべて</option>
         {stationOptionList}
       </LabeledSelect>
+      <div style={{ flexGrow: '1' }}>{props.suffixContainer}</div>
     </div>
   )
 }
