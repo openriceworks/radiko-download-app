@@ -47,5 +47,23 @@ export const AreaDictionaly = {
   JP46: '鹿児島',
   JP47: '沖縄'
 } as const
-
 export type AreaDictionaly = keyof typeof AreaDictionaly
+
+export type AreaGroup =
+  | '北海道・東北'
+  | '関東'
+  | '北陸・甲信越'
+  | '中部'
+  | '近畿'
+  | '中国・四国'
+  | '九州・沖縄'
+
+export const GroupedAreaDictionary = {
+  '北海道・東北': ['JP1', 'JP2', 'JP3', 'JP4', 'JP5', 'JP6', 'JP7'],
+  関東: ['JP8', 'JP9', 'JP10', 'JP10', 'JP11', 'JP12', 'JP13', 'JP14'],
+  '北陸・甲信越': ['JP15', 'JP19', 'JP20', 'JP17', 'JP16', 'JP18'],
+  中部: ['JP23', 'JP21', 'JP22', 'JP24'],
+  近畿: ['JP27', 'JP28', 'JP26', 'JP25', 'JP29', 'JP30'],
+  '中国・四国': ['JP33', 'JP34', 'JP31', 'JP32', 'JP35', 'JP37', 'JP36', 'JP38', 'JP39'],
+  '九州・沖縄': ['JP40', 'JP41', 'JP42', 'JP43', 'JP44', 'JP45', 'JP46', 'JP47']
+} satisfies Record<AreaGroup, AreaDictionaly[]>

@@ -7,9 +7,9 @@ import {
 import dayjs from 'dayjs'
 import { Input, makeStyles, tokens } from '@fluentui/react-components'
 import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
-import { AreaDictionaly } from '../../../../shared/constant/area'
 import { ReactNode } from 'react'
 import MenuSelect from '../Elements/MenuSelect'
+import AreaSelect from '../Elements/AreaSelect'
 
 interface Props {
   stationsList: StationInfo[]
@@ -33,13 +33,6 @@ const ProgramSearchForm = (props: Props) => {
     return {
       name: station.stationId,
       label: station.stationName
-    }
-  })
-
-  const areaList = Object.entries(AreaDictionaly).map(([areaCode, areaName]) => {
-    return {
-      name: areaCode,
-      label: areaName
     }
   })
 
@@ -78,13 +71,12 @@ const ProgramSearchForm = (props: Props) => {
         list={dateList}
       />
 
-      <MenuSelect
+      <AreaSelect
         placeholder="地域"
         icon={<Map24Regular />}
         appearance="transparent"
         value={props.value.areaId}
         onValueChange={(value) => setValue('areaId', value)}
-        list={areaList}
       />
 
       <MenuSelect
