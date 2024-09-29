@@ -63,7 +63,7 @@ const ProgramSearchForm = (props: Props) => {
   return (
     <div className={classes.root}>
       <Input
-        placeholder="キーワード"
+        placeholder="番組名で検索"
         contentBefore={<Search24Regular />}
         value={props.value.keyword}
         onChange={(e) => setValue('keyword', e.target.value)}
