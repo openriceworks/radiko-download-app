@@ -36,11 +36,21 @@ const useHeaderTitleStyles = makeStyles({
   root: {
     textOverflow: 'ellipsis',
     ...shorthands.overflow('hidden'),
-    // タイトル2行分の高さ
-    maxHeight: '40px',
     display: '-webkit-box',
     WebkitBoxOrient: 'vertical',
     WebkitLineClamp: '2'
+  }
+})
+
+const useDescriptionStyles = makeStyles({
+  root: {
+    width: '100%',
+    display: 'flex',
+    flexWrap: 'wrap',
+    columnGap: tokens.spacingHorizontalS
+  },
+  stationName: {
+    flexGrow: '1'
   }
 })
 
@@ -70,9 +80,11 @@ function ProgramCardHeader(program: ProgramForCard): JSX.Element {
 function ProgramCardDescription(program: ProgramForCard): JSX.Element {
   const startDateTime = getDayjs(program.ft, 'YYYYMMDDhhmmss')
   const endDateTime = getDayjs(program.to, 'YYYYMMDDhhmmss')
+  const classes = useDescriptionStyles()
   return (
-    <Caption1>
-      {program.stationName} | {formatDateRange(startDateTime, endDateTime)}
+    <Caption1 className={classes.root}>
+      <span className={classes.stationName}>{program.stationName}</span>
+      <span>{formatDateRange(startDateTime, endDateTime)}</span>
     </Caption1>
   )
 }
@@ -129,12 +141,13 @@ export default function ProgramCard(props: ProgramCardProps): JSX.Element {
   const styles = useStyles()
 
   return (
-    <Card size="large">
+    <Card size="large" style={{ height: '100%' }}>
       <CardPreview className={styles.cardPreview}>
         <Image src={props.program.imgPath ?? undefined} loading="lazy" fit="contain" />
       </CardPreview>
-      <div style={{ height: '56px' }}>
+      <div>
         <CardHeader
+          style={{ rowGap: tokens.spacingVerticalXS }}
           header={ProgramCardHeader(props.program)}
           description={ProgramCardDescription(props.program)}
         />
