@@ -18,8 +18,7 @@ const useStyles = makeStyles({
   child: {
     height: '100%',
     width: 'fit-content',
-    display: 'flex',
-    flexDirection: 'row',
+    display: 'grid',
     columnGap: tokens.spacingHorizontalXL,
     // 左端のカードのborderが切れるので1pxずらす
     marginLeft: '1px',
@@ -131,6 +130,7 @@ export default function ProgramScrollView(props: Props): JSX.Element {
             aria-setsize={programListList.length}
             key={index}
             className={classes.child}
+            style={{ gridTemplateColumns: `repeat(${columnCount}, 1fr)` }}
           >
             {programListList[index].map((program, programIndex) => (
               <ProgramCardWrapper key={`${index}-${programIndex}`} program={program} />
