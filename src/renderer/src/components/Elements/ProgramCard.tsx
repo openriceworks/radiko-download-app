@@ -141,7 +141,10 @@ export default function ProgramCard(props: ProgramCardProps): JSX.Element {
   const styles = useStyles()
 
   return (
-    <Card size="large" style={{ height: '100%', maxHeight: '320px' }}>
+    <Card
+      size="large"
+      style={{ width: '100%', maxWidth: '480px', height: '100%', maxHeight: '480px' }}
+    >
       <CardPreview className={styles.cardPreview}>
         <Image src={props.program.imgPath ?? undefined} loading="lazy" fit="contain" />
       </CardPreview>
