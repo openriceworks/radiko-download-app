@@ -1,11 +1,16 @@
-import { Search24Regular } from '@fluentui/react-icons'
+import {
+  CalendarDate24Regular,
+  Map24Regular,
+  Search24Regular,
+  SoundWaveCircle20Regular
+} from '@fluentui/react-icons'
 import dayjs from 'dayjs'
-import LabeledSelect from '../Elements/LabeledSelect'
 import LabeledInput from '../Elements/LabledInput'
 import { makeStyles, tokens } from '@fluentui/react-components'
 import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
 import { AreaDictionaly } from '../../../../shared/constant/area'
 import { ReactNode } from 'react'
+import MenuSelect from '../Elements/MenuSelect'
 
 interface Props {
   stationsList: StationInfo[]
@@ -25,24 +30,27 @@ const useStyles = makeStyles({
 })
 
 const ProgramSearchForm = (props: Props) => {
-  const stationOptionList = props.stationsList.map((station) => (
-    <option key={station.stationId} value={station.stationId}>
-      {station.stationName}
-    </option>
-  ))
+  const stationList = props.stationsList.map((station) => {
+    return {
+      name: station.stationId,
+      label: station.stationName
+    }
+  })
 
-  const areaOptionList = Object.entries(AreaDictionaly).map(([areaCode, areaName]) => (
-    <option key={areaCode} value={areaCode}>
-      {areaName}
-    </option>
-  ))
+  const areaList = Object.entries(AreaDictionaly).map(([areaCode, areaName]) => {
+    return {
+      name: areaCode,
+      label: areaName
+    }
+  })
 
   const programMap = props.stationProgramList[0]?.programMap ?? {}
-  const dateOptionList = Object.keys(programMap).map((date) => (
-    <option key={date} value={date}>
-      {dayjs(date).format('MM月DD日')}
-    </option>
-  ))
+  const dateList = Object.keys(programMap).map((date) => {
+    return {
+      name: date,
+      label: dayjs(date).format('MM月DD日')
+    }
+  })
 
   const setValue = (key: keyof SearchParam, value: string) => {
     props.setValue({
@@ -61,33 +69,31 @@ const ProgramSearchForm = (props: Props) => {
         value={props.value.keyword}
         onChange={(e) => setValue('keyword', e.target.value)}
       />
-      <LabeledSelect
-        label="日付"
+
+      <MenuSelect
+        placeholder="放送日"
+        icon={<CalendarDate24Regular />}
         value={props.value.date}
-        onChange={(e) => setValue('date', e.target.value)}
-        defaultValue=""
-      >
-        <option value="">すべて</option>
-        {dateOptionList}
-      </LabeledSelect>
-      <LabeledSelect
-        label="地域"
+        onValueChange={(value) => setValue('date', value)}
+        list={dateList}
+      />
+
+      <MenuSelect
+        placeholder="地域"
+        icon={<Map24Regular />}
         value={props.value.areaId}
-        onChange={(e) => setValue('areaId', e.target.value)}
-        defaultValue=""
-      >
-        <option value="">すべて</option>
-        {areaOptionList}
-      </LabeledSelect>
-      <LabeledSelect
-        label="放送局"
+        onValueChange={(value) => setValue('areaId', value)}
+        list={areaList}
+      />
+
+      <MenuSelect
+        placeholder="放送局"
+        icon={<SoundWaveCircle20Regular />}
         value={props.value.stationId}
-        onChange={(e) => setValue('stationId', e.target.value)}
-        defaultValue=""
-      >
-        <option value="">すべて</option>
-        {stationOptionList}
-      </LabeledSelect>
+        onValueChange={(value) => setValue('stationId', value)}
+        list={stationList}
+      />
+
       <div style={{ flexGrow: '1' }}>{props.suffixContainer}</div>
     </div>
   )
