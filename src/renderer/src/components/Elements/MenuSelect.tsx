@@ -1,6 +1,7 @@
 import {
   Menu,
   MenuButton,
+  MenuButtonProps,
   MenuGroup,
   MenuItemRadio,
   MenuList,
@@ -14,7 +15,8 @@ import { useCallback, useMemo } from 'react'
 
 export interface MenuSelectProps extends Omit<MenuProps, 'children'> {
   placeholder: string
-  icon?: Slot<'span'>
+  icon?: MenuButtonProps['icon']
+  appearance?: MenuButtonProps['appearance']
   value: string
   onValueChange: (string) => void
   emptyValueLabel?: string
@@ -27,6 +29,7 @@ export interface MenuSelectProps extends Omit<MenuProps, 'children'> {
 export default function MenuSelect({
   placeholder,
   icon,
+  appearance,
   value,
   onValueChange,
   emptyValueLabel,
@@ -71,7 +74,7 @@ export default function MenuSelect({
   return (
     <Menu {...menuProps} checkedValues={checkedValues} onCheckedValueChange={onChange}>
       <MenuTrigger>
-        <MenuButton icon={icon}>
+        <MenuButton icon={icon} appearance={appearance}>
           <span style={menuButtonTextStyle}>{visibleLabel}</span>
         </MenuButton>
       </MenuTrigger>

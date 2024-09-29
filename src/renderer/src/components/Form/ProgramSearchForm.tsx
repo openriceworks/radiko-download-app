@@ -69,11 +69,10 @@ const ProgramSearchForm = (props: Props) => {
         onChange={(e) => setValue('keyword', e.target.value)}
       />
 
-      <hr />
-
       <MenuSelect
         placeholder="放送日"
         icon={<CalendarDate24Regular />}
+        appearance="transparent"
         value={props.value.date}
         onValueChange={(value) => setValue('date', value)}
         list={dateList}
@@ -82,6 +81,7 @@ const ProgramSearchForm = (props: Props) => {
       <MenuSelect
         placeholder="地域"
         icon={<Map24Regular />}
+        appearance="transparent"
         value={props.value.areaId}
         onValueChange={(value) => setValue('areaId', value)}
         list={areaList}
@@ -90,6 +90,7 @@ const ProgramSearchForm = (props: Props) => {
       <MenuSelect
         placeholder="放送局"
         icon={<SoundWaveCircle20Regular />}
+        appearance="transparent"
         value={props.value.stationId}
         onValueChange={(value) => setValue('stationId', value)}
         list={stationList}
