@@ -5,8 +5,7 @@ import {
   SoundWaveCircle20Regular
 } from '@fluentui/react-icons'
 import dayjs from 'dayjs'
-import LabeledInput from '../Elements/LabledInput'
-import { makeStyles, tokens } from '@fluentui/react-components'
+import { Input, makeStyles, tokens } from '@fluentui/react-components'
 import { SearchParam, StationInfo, StationWithProgram } from 'src/shared/types'
 import { AreaDictionaly } from '../../../../shared/constant/area'
 import { ReactNode } from 'react'
@@ -63,12 +62,14 @@ const ProgramSearchForm = (props: Props) => {
 
   return (
     <div className={classes.root}>
-      <LabeledInput
-        label="キーワード"
+      <Input
+        placeholder="キーワード"
         contentBefore={<Search24Regular />}
         value={props.value.keyword}
         onChange={(e) => setValue('keyword', e.target.value)}
       />
+
+      <hr />
 
       <MenuSelect
         placeholder="放送日"
