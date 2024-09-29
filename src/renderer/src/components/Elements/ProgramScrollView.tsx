@@ -12,12 +12,14 @@ interface Props {
 }
 
 const useStyles = makeStyles({
-  scrollViewContainer: {
-    rowGap: tokens.spacingVerticalXL
-  },
   child: {
     height: '100%',
     width: 'fit-content',
+    // 行ごとの余白
+    // 親要素のrowGapを使用していない理由
+    // VirtualScrollViewリストは最初と最後に見えないタグが作られる実装なので
+    // rowGapを適用すると、最初のアイテムの上部と最後のアイテムの下部にもrowGapの空間が開いてしまうため
+    marginBottom: tokens.spacingVerticalXL,
     display: 'grid',
     columnGap: tokens.spacingHorizontalXL,
     // 左端のカードのborderが切れるので1pxずらす
@@ -118,8 +120,7 @@ export default function ProgramScrollView(props: Props): JSX.Element {
       // height: 200px
       itemSize={200}
       container={{
-        role: 'list',
-        className: classes.scrollViewContainer
+        role: 'list'
       }}
     >
       {(index: number) => {
